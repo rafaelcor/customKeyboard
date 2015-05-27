@@ -21,6 +21,17 @@ import gtk
 
 
 class CustomKey:
+    def get_main_menu(self, window):
+        accel_group = gtk.AccelGroup()
+        item_factory = gtk.ItemFactory(gtk.MenuBar, "<main>", accel_group)
+
+        item_factory.create_items(self.menu_items)
+
+        window.add_accel_group(accel_group)
+
+        self.item_factory = item_factory
+        return item_factory.get_widget("<main>")
+
     def move_key(self, widget, event, key):
         self.evpos = self.save[key][0:2]
         self.evpos[0] += int(event.x - 25)
@@ -93,6 +104,19 @@ class CustomKey:
             pass
 
     def __init__(self):
+        self.menu_items = (
+            ( "/_File",         None,         None, 0, "<Branch>" ),
+            ( "/File/_New",     "<control>N", None, 0, None ),
+            ( "/File/_Open",    "<control>O", None, 0, None ),
+            ( "/File/_Save",    "<control>S", None, 0, None ),
+            ( "/File/Save _As", None,         None, 0, None ),
+            ( "/File/sep1",     None,         None, 0, "<Separator>" ),
+            ( "/File/Quit",     "<control>Q", gtk.main_quit, 0, None ),
+            ( "/_Options",      None,         None, 0, "<Branch>" ),
+            ( "/Options/Test",  None,         None, 0, None ),
+            ( "/_Help",         None,         None, 0, "<LastBranch>" ),
+            ( "/_Help/About",   None,         None, 0, None ),
+            )
         self.mousePosition = []
         self.cont = 2
         self.save = {1:
@@ -132,9 +156,13 @@ class CustomKey:
         window.connect("key-press-event", self.new_button)
         window.connect("destroy", gtk.main_quit)
 
+        self.vbox = gtk.VBox(False, 1)
+        self.vbox.set_border_width(1)
 
-
-        window.add(self.eventbox)
+        window.add(self.vbox)
+        menubar = self.get_main_menu(window)
+        self.vbox.pack_start(menubar, False, True, 0)
+        self.vbox.add(self.eventbox)
         self.eventbox.add(self.fixed)
         window.show_all()
 

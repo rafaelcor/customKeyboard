@@ -26,6 +26,7 @@ class CustomKey:
         self.evpos[0] += int(event.x - 25)
         self.evpos[1] += int(event.y - 25)
         self.fixed.move(widget, self.evpos[0], self.evpos[1])
+        self.save[key][0:2] = self.evpos
 
     def change_name(self, widget, event, key, button):
         print event.keyval

@@ -60,9 +60,9 @@ class CustomKey:
 
             b = gtk.EventBox()
             b.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=65535, green=65535, blue=65535))
-
+            b.set_border_width(1)
             b.set_size_request(self.save[self.cont][2], self.save[self.cont][3])
-            b.connect('button-press-event', self.move_key, self.cont)
+            b.connect('button-press-event', self.onButtonPress, self.cont)
             b.connect('motion-notify-event', self.move_key, self.cont)
             self.fixed.put(b, self.save[self.cont][0], self.save[self.cont][1])
             self.window.show_all()
@@ -114,6 +114,7 @@ class CustomKey:
 
         for key in self.save:
             self.bb = gtk.EventBox()
+            self.bb.set_border_width(1)
             self.bb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=65535, green=65535, blue=65535))
             #self.bq.set_size_request(50, 50)
             self.bb.set_size_request(self.save[key][2], self.save[key][3])

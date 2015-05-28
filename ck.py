@@ -22,7 +22,24 @@ import gtk
 
 class CustomKey:
     def openFromJSON(self, widget, data):
-        pass
+        fileChooserDialog = gtk.FileChooserDialog("Save Keyboard", None,
+         gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+         gtk.STOCK_OK, gtk.RESPONSE_OK))
+        keyboardFilter = gtk.FileFilter()
+        keyboardFilter.set_name("Keyboard Files")
+        keyboardFilter.add_pattern("*.keyboard")
+        fileChooserDialog.add_filter(filter)
+        response = fileChooserDialog.run()
+        if response == gtk.RESPONSE_OK:
+            fileName = fileChooserDialog.get_filename()
+            print fileName
+            f = open(fileName, "r")
+            fr = f.readlines()
+            self.save = json.loads(fr[0])
+            self.window.show_all()
+        elif response == gtk.RESPONSE_CANCEL:
+            pass
+        fileChooserDialog.destroy()
     def saveToJSON(self, widget, data):
         fileChooserDialog = gtk.FileChooserDialog("Save Keyboard", None,
          gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -126,7 +143,7 @@ class CustomKey:
         self.menu_items = (
             ( "/_File",         None,         None, 0, "<Branch>" ),
             ( "/File/_New",     "<control>N", None, 0, None ),
-            ( "/File/_Open",    "<control>O", None, 0, None ),
+            ( "/File/_Open",    "<control>O", self.openFromJSON, 0, None ),
             ( "/File/_Save",    "<control>S", None, 0, None ),
             ( "/File/Save _As", None,         self.saveToJSON, 0, None ),
             ( "/File/sep1",     None,         None, 0, "<Separator>" ),

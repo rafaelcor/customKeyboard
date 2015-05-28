@@ -15,12 +15,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-
+import json
 import gtk
 #import gobject
 
 
 class CustomKey:
+    def openFromJSON(self, widget, data):
+        pass
+    def saveToJSON(self, widget, data):
+        fileChooserDialog = gtk.FileChooserDialog("Save Keyboard", None,
+         gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+         gtk.STOCK_OK, gtk.RESPONSE_OK))
+        response = fileChooserDialog.run()
+        if response == gtk.RESPONSE_OK:
+            fileName = fileChooserDialog.get_filename()
+            print fileName
+            if not fileName.endswith('.keyboard'):
+                fileName += ".keyboard"
+            f = open(fileName, "w")
+            f.write(json.dumps(self.save))
+        elif response == gtk.RESPONSE_CANCEL:
+            pass
+        fileChooserDialog.destroy()
+
+        pass
     def get_main_menu(self, window):
         accel_group = gtk.AccelGroup()
         item_factory = gtk.ItemFactory(gtk.MenuBar, "<main>", accel_group)
@@ -109,7 +128,7 @@ class CustomKey:
             ( "/File/_New",     "<control>N", None, 0, None ),
             ( "/File/_Open",    "<control>O", None, 0, None ),
             ( "/File/_Save",    "<control>S", None, 0, None ),
-            ( "/File/Save _As", None,         None, 0, None ),
+            ( "/File/Save _As", None,         self.saveToJSON, 0, None ),
             ( "/File/sep1",     None,         None, 0, "<Separator>" ),
             ( "/File/Quit",     "<control>Q", gtk.main_quit, 0, None ),
             ( "/_Options",      None,         None, 0, "<Branch>" ),

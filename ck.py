@@ -33,7 +33,7 @@ class CustomKey:
             ("/File/sep1",     None,         None, 0, "<Separator>" ),
             ("/File/Quit",     "<control>Q", gtk.main_quit, 0, None ),
             ("/_Options",      None,         None, 0, "<Branch>" ),
-            ("/Options/Run keyboard",  "<control>R",None , 0, None ),
+            ("/Options/Run keyboard",  "<control>R", self.run , 0, None ),
             ("/_Help",         None,         None, 0, "<LastBranch>" ),
             ("/_Help/About",   None,         None, 0, None ),
             )
@@ -77,7 +77,18 @@ class CustomKey:
         self.eventbox.add(self.fixed)
         window.show_all()
 
-    def run(self):
+    def run(self, widget, event):
+        self.window2 = gtk.Window()
+        self.fixed2 = gtk.Fixed()
+        self.window2.add(self.fixed2)
+        self.window2.show_all()
+        self.fixed2.show_all()
+
+        for key in self.save:
+            button = gtk.Button(self.save[key][4])
+            button.set_size_request(self.save[key][2], self.save[key][3])
+            self.fixed2.put(button, self.save[key][0], self.save[key][1])
+            button.show()
         pass
 
     def init(self):

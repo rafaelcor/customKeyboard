@@ -21,6 +21,77 @@ import gtk
 
 
 class CustomKey:
+    def __init__(self):
+        self.menu_items = (
+            ("/_File",         None,         None, 0, "<Branch>"),
+            ("/File/_New",     "<control>N", None, 0, None),
+            ("/File/_Open",    "<control>O", self.openFromJSON, 0, None ),
+            ("/File/_Save",    "<control>S", None, 0, None ),
+            ("/File/Save _As", None,         self.saveToJSON, 0, None ),
+            ("/File/sep1",     None,         None, 0, "<Separator>" ),
+            ("/File/Quit",     "<control>Q", gtk.main_quit, 0, None ),
+            ("/_Options",      None,         None, 0, "<Branch>" ),
+            ("/Options/Run keyboard",  "<control>R",None , 0, None ),
+            ("/_Help",         None,         None, 0, "<LastBranch>" ),
+            ("/_Help/About",   None,         None, 0, None ),
+            )
+        self.mousePosition = []
+        self.cont = 1
+        self.save = {}  # "button name":[x, y, sx, sy func]
+        self.edit = 0
+        self.evpos = []
+        window = gtk.Window()
+        self.window = window
+        window.set_size_request(500, 500)
+        self.eventbox = gtk.EventBox()
+        self.eventbox.set_events(
+            gtk.gdk.BUTTON_MOTION_MASK|               # restoring missed masks
+            gtk.gdk.BUTTON1_MOTION_MASK|
+            gtk.gdk.BUTTON2_MOTION_MASK|
+            gtk.gdk.BUTTON3_MOTION_MASK
+        )
+        self.fixed = gtk.Fixed()
+        self.init()
+        window.add_events(gtk.gdk.MOTION_NOTIFY | gtk.gdk.BUTTON_PRESS)
+
+        window.connect("key-press-event", self.new_button)
+        window.connect("destroy", gtk.main_quit)
+
+        self.vbox = gtk.VBox(False, 1)
+        self.vbox.set_border_width(1)
+
+        window.add(self.vbox)
+        menubar = self.get_main_menu(window)
+        self.vbox.pack_start(menubar, False, True, 0)
+        self.vbox.add(self.eventbox)
+        self.eventbox.add(self.fixed)
+        window.show_all()
+
+
+    def run(self):
+        pass
+    def init(self):
+        for key in self.save:
+            self.bb = gtk.EventBox()
+            self.bb.set_border_width(1)
+            self.bb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=65535, green=65535, blue=65535))
+            #self.bq.set_size_request(50, 50)
+            self.bb.set_size_request(self.save[key][2], self.save[key][3])
+            #self.b.connect("button-press-event", self.onButtonPress, key)
+            #self.b.connect("button-release-event", self.onButtonRelease, key)
+            #self.eventbox.connect('button-press-event', self.onButtonPress, self.b, key)
+            #self.eventbox.connect('motion-notify-event', self.onButtonPress, self.b, key)
+
+            self.bb.connect('button-press-event', self.onButtonPress, key)
+            self.bb.connect('motion-notify-event', self.move_key, key)
+            self.bb.connect("enter-notify-event", self.test)
+            self.bb.add(gtk.Label(self.save[key][4]))
+            self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
+    def test(self, widget, event):
+        pass
+        #if event.x <= 25:
+         #   widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.SIZING))
+
     def openFromJSON(self, widget, data):
         fileChooserDialog = gtk.FileChooserDialog("Save Keyboard", None,
          gtk.FILE_CHOOSER_ACTION_OPEN, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -28,7 +99,7 @@ class CustomKey:
         keyboardFilter = gtk.FileFilter()
         keyboardFilter.set_name("Keyboard Files")
         keyboardFilter.add_pattern("*.keyboard")
-        fileChooserDialog.add_filter(filter)
+        fileChooserDialog.add_filter(keyboardFilter)
         response = fileChooserDialog.run()
         if response == gtk.RESPONSE_OK:
             fileName = fileChooserDialog.get_filename()
@@ -36,10 +107,12 @@ class CustomKey:
             f = open(fileName, "r")
             fr = f.readlines()
             self.save = json.loads(fr[0])
+            self.init()
             self.window.show_all()
         elif response == gtk.RESPONSE_CANCEL:
             pass
         fileChooserDialog.destroy()
+
     def saveToJSON(self, widget, data):
         fileChooserDialog = gtk.FileChooserDialog("Save Keyboard", None,
          gtk.FILE_CHOOSER_ACTION_SAVE, (gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
@@ -52,11 +125,13 @@ class CustomKey:
                 fileName += ".keyboard"
             f = open(fileName, "w")
             f.write(json.dumps(self.save))
+
         elif response == gtk.RESPONSE_CANCEL:
             pass
         fileChooserDialog.destroy()
 
         pass
+
     def get_main_menu(self, window):
         accel_group = gtk.AccelGroup()
         item_factory = gtk.ItemFactory(gtk.MenuBar, "<main>", accel_group)
@@ -83,7 +158,6 @@ class CustomKey:
             widget.destroy()
             button.add(gtk.Label(self.save[key][4]))
             button.show_all()
-
 
     def onButtonDoubleClick(self, widget, event, key):
         print ("2 clicked")
@@ -139,68 +213,7 @@ class CustomKey:
         else:
             pass
 
-    def __init__(self):
-        self.menu_items = (
-            ( "/_File",         None,         None, 0, "<Branch>" ),
-            ( "/File/_New",     "<control>N", None, 0, None ),
-            ( "/File/_Open",    "<control>O", self.openFromJSON, 0, None ),
-            ( "/File/_Save",    "<control>S", None, 0, None ),
-            ( "/File/Save _As", None,         self.saveToJSON, 0, None ),
-            ( "/File/sep1",     None,         None, 0, "<Separator>" ),
-            ( "/File/Quit",     "<control>Q", gtk.main_quit, 0, None ),
-            ( "/_Options",      None,         None, 0, "<Branch>" ),
-            ( "/Options/Test",  None,         None, 0, None ),
-            ( "/_Help",         None,         None, 0, "<LastBranch>" ),
-            ( "/_Help/About",   None,         None, 0, None ),
-            )
-        self.mousePosition = []
-        self.cont = 2
-        self.save = {1:
-                    [50, 50, 50, 50, ""]}  # "button name":[x, y, sx, sy func]
-        self.edit = 0
-        self.evpos = []
-        #self.pos = [50, 50]
-        window = gtk.Window()
-        self.window = window
-        window.set_size_request(500, 500)
-        self.eventbox = gtk.EventBox()
-        self.eventbox.set_events(
-            gtk.gdk.BUTTON_MOTION_MASK|               # restoring missed masks
-            gtk.gdk.BUTTON1_MOTION_MASK|
-            gtk.gdk.BUTTON2_MOTION_MASK|
-            gtk.gdk.BUTTON3_MOTION_MASK
-        )
-        self.fixed = gtk.Fixed()
 
-        for key in self.save:
-            self.bb = gtk.EventBox()
-            self.bb.set_border_width(1)
-            self.bb.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=65535, green=65535, blue=65535))
-            #self.bq.set_size_request(50, 50)
-            self.bb.set_size_request(self.save[key][2], self.save[key][3])
-            #self.b.connect("button-press-event", self.onButtonPress, key)
-            #self.b.connect("button-release-event", self.onButtonRelease, key)
-            #self.eventbox.connect('button-press-event', self.onButtonPress, self.b, key)
-            #self.eventbox.connect('motion-notify-event', self.onButtonPress, self.b, key)
-
-            self.bb.connect('button-press-event', self.onButtonPress, key)
-            self.bb.connect('motion-notify-event', self.move_key, key)
-            self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
-
-        window.add_events(gtk.gdk.MOTION_NOTIFY | gtk.gdk.BUTTON_PRESS)
-
-        window.connect("key-press-event", self.new_button)
-        window.connect("destroy", gtk.main_quit)
-
-        self.vbox = gtk.VBox(False, 1)
-        self.vbox.set_border_width(1)
-
-        window.add(self.vbox)
-        menubar = self.get_main_menu(window)
-        self.vbox.pack_start(menubar, False, True, 0)
-        self.vbox.add(self.eventbox)
-        self.eventbox.add(self.fixed)
-        window.show_all()
 
 if __name__ == "__main__":
     CustomKey()

@@ -19,7 +19,7 @@ import json
 import gtk
 #import gobject
 
-INITIAL_X, INITIAL_Y = 50, 50
+INITIAL_X, INITIAL_Y = 0, 50
 
 
 class CustomKey:
@@ -44,22 +44,26 @@ class CustomKey:
         self.evpos = []
         window = gtk.Window()
         self.window = window
-        window.set_size_request(500, 500)
+        window.set_size_request(window.get_screen().get_width(),
+                                window.get_screen().get_height() / 3)
         self.eventbox = gtk.EventBox()
         self.eventbox.set_events(
-            gtk.gdk.BUTTON_MOTION_MASK|               # restoring missed masks
-            gtk.gdk.BUTTON1_MOTION_MASK|
-            gtk.gdk.BUTTON2_MOTION_MASK|
+            gtk.gdk.BUTTON_MOTION_MASK |               # restoring missed masks
+            gtk.gdk.BUTTON1_MOTION_MASK |
+            gtk.gdk.BUTTON2_MOTION_MASK |
             gtk.gdk.BUTTON3_MOTION_MASK
         )
         self.fixed = gtk.Fixed()
+        self.fixed.set_size_request(window.get_screen().get_width(),
+                                    window.get_screen().get_height() / 3
+                                    )
+
         self.menu = gtk.Menu()
         self.menu_optionEditProperties = gtk.MenuItem("Edit Properties")
         self.menu_deleteButton = gtk.MenuItem("Remove Button")
         self.menu.add(self.menu_optionEditProperties)
         self.menu.add(self.menu_deleteButton)
         self.menu.show_all()
-
 
         self.init()
         window.add_events(gtk.gdk.MOTION_NOTIFY | gtk.gdk.BUTTON_PRESS)
@@ -106,10 +110,17 @@ class CustomKey:
             self.bb.connect('motion-notify-event', self.move_key, key)
             self.bb.connect("enter-notify-event", self.test)
             self.bb.connect_object("event", self.onButtonRightClick, self.menu)
-            self.menu_deleteButton.connect("button-press-event", self.removeButton, self.cont, self.bb)
-            self.menu_optionEditProperties.connect("button-press-event", self.editButton, self.cont, self.bb)
+            self.menu_deleteButton.connect("button-press-event",
+                                            self.removeButton,
+                                            self.cont,
+                                            self.bb)
+            self.menu_optionEditProperties.connect("button-press-event",
+                                                   self.editButton,
+                                                   self.cont,
+                                                   self.bb)
             self.bb.add(gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
+
     def test(self, widget, event):
         pass
         #if event.x <= 25:
@@ -206,14 +217,22 @@ class CustomKey:
             self.save[self.cont] = [x + 50, y, 50, 50, ""]
 
             b = gtk.EventBox()
-            b.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=65535, green=65535, blue=65535))
+            b.modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color(red=65535,
+                                                        green=65535,
+                                                        blue=65535))
             b.set_border_width(1)
             b.set_size_request(self.save[self.cont][2], self.save[self.cont][3])
             b.connect('button-press-event', self.onButtonPress, self.cont)
             b.connect('motion-notify-event', self.move_key, self.cont)
             b.connect_object("event", self.onButtonRightClick, self.menu)
-            self.menu_deleteButton.connect("button-press-event", self.removeButton, self.cont, b)
-            self.menu_optionEditProperties.connect("button-press-event", self.editButton, self.cont, b)
+            self.menu_deleteButton.connect("button-press-event",
+                                           self.removeButton,
+                                           self.cont,
+                                           b)
+            self.menu_optionEditProperties.connect("button-press-event",
+                                                   self.editButton,
+                                                   self.cont,
+                                                   b)
             self.fixed.put(b, self.save[self.cont][0], self.save[self.cont][1])
             self.window.show_all()
 
@@ -253,6 +272,7 @@ class CustomKey:
         #button.destroy()
         #self.fixed.show_all()
         print key
+
     def editButton(self, widget, event, key, button):
         print key
 

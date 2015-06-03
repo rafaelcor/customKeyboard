@@ -21,6 +21,7 @@ from gi.repository import Gtk, Gdk
 #import gobject
 
 INITIAL_X, INITIAL_Y = 0, 50
+INITIAL_W, INITIAL_H = 50, 50
 
 UI_INFO = """
 <ui>
@@ -52,6 +53,7 @@ UI_INFO = """
 
 class CustomKey:
     def __init__(self):
+        self.editing = False
         """
         self.menu_items = (
             ("/_File",         None,         None, 0, "<Branch>"),
@@ -272,15 +274,20 @@ class CustomKey:
 
         if event.keyval == 65293 or event.keyval == 65421:
             self.save[key][4] = widget.get_text()
+            #self.save[key][2], self.save[key][3] = button.get_size_request()
+
             widget.destroy()
             button.add(Gtk.Label(self.save[key][4]))
             button.show_all()
+            self.editing = False
 
     def onButtonDoubleClick(self, widget, event, key):
+        self.editing = True
         print ("2 clicked")
         if widget.get_child() is not None:
             widget.remove(widget.get_child())
         entry = Gtk.Entry()
+
         if self.save[key][4] != "":
             entry.set_text(self.save[key][4])
         entry.set_can_focus(1)
@@ -289,15 +296,20 @@ class CustomKey:
         entry.connect("key-press-event", self.change_name, key, widget)
         widget.add(entry)
         widget.show_all()
+        #entry.set_size_request(50, 50)
 
     def new_button(self, widget, event):
         #print "new"
-        if event.keyval == 110:
+        w, h = INITIAL_W, INITIAL_H
+        if event.keyval == 110 and self.editing is not True:
             try:
                 x, y = self.save[self.save.keys()[-1]][0:2]
+                w, h = self.save[self.save.keys()[-1]][2:4]
+                print w,h
             except:
                 x, y = INITIAL_X, INITIAL_Y
-            self.save[self.cont] = [x + 50, y, 50, 50, ""]
+                w, h = INITIAL_W, INITIAL_H
+            self.save[self.cont] = [x + w, y, 50, 50, ""]
 
             b = Gtk.EventBox()
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
@@ -322,8 +334,7 @@ class CustomKey:
         self.cont += 1
 
     def onButtonPress(self, widget, event, key):
-
-        if event.type == Gdk._2BUTTON_PRESS:
+        if event.type == Gdk.EventType._2BUTTON_PRESS:
             self.onButtonDoubleClick(widget, event, key)
 
         else:
@@ -345,7 +356,7 @@ class CustomKey:
             pass
 
     def onButtonRightClick(self, widget, event):
-        if event.type == Gdk.BUTTON_PRESS and event.button == 3:
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             widget.popup(None, None, None, event.button, event.time)
             print
             pass

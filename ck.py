@@ -123,7 +123,7 @@ class CustomKey:
         self.eventbox.add(self.fixed)
         window.show_all()
 
-    def run(self, widget, event):
+    def run(self, event):
         self.window2 = Gtk.Window()
         self.fixed2 = Gtk.Fixed()
         self.window2.add(self.fixed2)
@@ -148,10 +148,10 @@ class CustomKey:
                                                               blue=65535))
             self.bb.set_size_request(self.save[key][2], self.save[key][3])
 
-            self.bb.connect('button-press-event', self.onButtonPress, key)
+            self.bb.connect('button-press-event', self.onButtonPress, key, self.menu)
             self.bb.connect('motion-notify-event', self.move_key, key)
             self.bb.connect("enter-notify-event", self.test)
-            self.bb.connect_object("event", self.onButtonRightClick, self.menu)
+            #self.bb.connect("event", self.onButtonRightClick, self.menu)
             self.menu_deleteButton.connect("button-press-event",
                                             self.removeButton,
                                             self.cont,
@@ -237,6 +237,7 @@ class CustomKey:
         action_group.add_action(action_optionmenu)
 
         action_optionrunkeyboard = Gtk.Action("OptionRunKeyboard", None, None, Gtk.STOCK_EXECUTE)
+        action_optionrunkeyboard.connect("activate", self.run)
         action_group.add_action(action_optionrunkeyboard)
 
 
@@ -317,9 +318,9 @@ class CustomKey:
                                                         blue=65535))
             b.set_border_width(1)
             b.set_size_request(self.save[self.cont][2], self.save[self.cont][3])
-            b.connect('button-press-event', self.onButtonPress, self.cont)
+            b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
             b.connect('motion-notify-event', self.move_key, self.cont)
-            b.connect_object("event", self.onButtonRightClick, self.menu)
+            #b.connect_object("event", self.onButtonRightClick, self.menu)
             self.menu_deleteButton.connect("button-press-event",
                                            self.removeButton,
                                            self.cont,
@@ -333,14 +334,22 @@ class CustomKey:
 
         self.cont += 1
 
-    def onButtonPress(self, widget, event, key):
+    def onButtonPress(self, widget, event, key, menu):
         if event.type == Gdk.EventType._2BUTTON_PRESS:
             self.onButtonDoubleClick(widget, event, key)
+
+        elif event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            print "right click"
+            menu.popup(None, None, None, None, 3, event.time)
+            print
+            pass
 
         else:
             self.evpos = self.save[key][0:2]
             self.evpos[0] += int(event.x - 25)
             self.evpos[1] += int(event.y - 25)
+
+
 
     def onButtonRelease(self, widget, event, key):
         #print "br"
@@ -355,14 +364,19 @@ class CustomKey:
         else:
             pass
 
+    """
     def onButtonRightClick(self, widget, event):
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-            widget.popup(None, None, None, event.button, event.time)
+            print "right click"
+            widget.popup(None, None, None, None, 3, event.time)
             print
             pass
+    """
 
     def removeButton(self, widget, event, key, button):
         print button
+        self.save.pop(key)
+        self.init()
         #button.destroy()
         #self.fixed.show_all()
         print key

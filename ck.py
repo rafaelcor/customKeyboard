@@ -101,6 +101,8 @@ class CustomKey:
         self.menu_deleteButton = Gtk.MenuItem("Remove Button")
         self.menu.add(self.menu_optionEditProperties)
         self.menu.add(self.menu_deleteButton)
+        self.menu_deleteButton.connect("button-press-event",
+                                        self.removeButton)
         self.menu.show_all()
 
         self.init()
@@ -152,16 +154,13 @@ class CustomKey:
             self.bb.connect('motion-notify-event', self.move_key, key)
             self.bb.connect("enter-notify-event", self.test)
             #self.bb.connect("event", self.onButtonRightClick, self.menu)
-            self.menu_deleteButton.connect("button-press-event",
-                                            self.removeButton,
-                                            self.cont,
-                                            self.bb)
             self.menu_optionEditProperties.connect("button-press-event",
                                                    self.editButton,
                                                    self.cont,
                                                    self.bb)
             self.bb.add(Gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
+        self.fixed.show_all()
 
     def test(self, widget, event):
         pass
@@ -321,10 +320,6 @@ class CustomKey:
             b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
             b.connect('motion-notify-event', self.move_key, self.cont)
             #b.connect_object("event", self.onButtonRightClick, self.menu)
-            self.menu_deleteButton.connect("button-press-event",
-                                           self.removeButton,
-                                           self.cont,
-                                           b)
             self.menu_optionEditProperties.connect("button-press-event",
                                                    self.editButton,
                                                    self.cont,
@@ -340,6 +335,7 @@ class CustomKey:
 
         elif event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             print "right click"
+            self.selected = key
             menu.popup(None, None, None, None, 3, event.time)
             print
             pass
@@ -373,13 +369,12 @@ class CustomKey:
             pass
     """
 
-    def removeButton(self, widget, event, key, button):
-        print button
-        self.save.pop(key)
+    def removeButton(self, widget, event):
+        self.save.pop(self.selected)
         self.init()
         #button.destroy()
         #self.fixed.show_all()
-        print key
+        print self.selected
 
     def editButton(self, widget, event, key, button):
         print key

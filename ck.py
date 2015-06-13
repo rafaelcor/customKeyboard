@@ -103,6 +103,9 @@ class CustomKey:
         self.menu.add(self.menu_deleteButton)
         self.menu_deleteButton.connect("button-press-event",
                                         self.removeButton)
+
+        self.menu_optionEditProperties.connect("button-press-event",
+                                               self.editButton)
         self.menu.show_all()
 
         self.init()
@@ -188,12 +191,12 @@ class CustomKey:
             pass
         fileChooserDialog.destroy()
 
-    def saveToJSON(self, widget, data):
+    def saveToJSON(self, widget):
         fileChooserDialog = Gtk.FileChooserDialog("Save Keyboard", None,
-         Gtk.FILE_CHOOSER_ACTION_SAVE, (Gtk.STOCK_CANCEL, Gtk.RESPONSE_CANCEL,
-         Gtk.STOCK_OK, Gtk.RESPONSE_OK))
+         Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+         Gtk.STOCK_OK, Gtk.ResponseType.OK))
         response = fileChooserDialog.run()
-        if response == Gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             fileName = fileChooserDialog.get_filename()
             print fileName
             if not fileName.endswith('.keyboard'):
@@ -201,7 +204,7 @@ class CustomKey:
             f = open(fileName, "w")
             f.write(json.dumps(self.save))
 
-        elif response == Gtk.RESPONSE_CANCEL:
+        elif response == Gtk.ResponseType.CANCEL:
             pass
         fileChooserDialog.destroy()
 

@@ -157,10 +157,10 @@ class CustomKey:
             self.bb.connect('motion-notify-event', self.move_key, key)
             self.bb.connect("enter-notify-event", self.test)
             #self.bb.connect("event", self.onButtonRightClick, self.menu)
-            self.menu_optionEditProperties.connect("button-press-event",
-                                                   self.editButton,
-                                                   self.cont,
-                                                   self.bb)
+            #self.menu_optionEditProperties.connect("button-press-event",
+             #                                      self.editButton,
+              #                                     self.cont,
+               #                                    self.bb)
             self.bb.add(Gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
         self.fixed.show_all()
@@ -266,11 +266,12 @@ class CustomKey:
         return item_factory.get_widget("<main>")
 
     def move_key(self, widget, event, key):
-        self.evpos = self.save[key][0:2]
-        self.evpos[0] += int(event.x - 25)
-        self.evpos[1] += int(event.y - 25)
-        self.fixed.move(widget, self.evpos[0], self.evpos[1])
-        self.save[key][0:2] = self.evpos
+        if not self.editing:
+            self.evpos = self.save[key][0:2]
+            self.evpos[0] += int(event.x - 25)
+            self.evpos[1] += int(event.y - 25)
+            self.fixed.move(widget, self.evpos[0], self.evpos[1])
+            self.save[key][0:2] = self.evpos
 
     def change_name(self, widget, event, key, button):
         print event.keyval
@@ -323,10 +324,10 @@ class CustomKey:
             b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
             b.connect('motion-notify-event', self.move_key, self.cont)
             #b.connect_object("event", self.onButtonRightClick, self.menu)
-            self.menu_optionEditProperties.connect("button-press-event",
-                                                   self.editButton,
-                                                   self.cont,
-                                                   b)
+            #self.menu_optionEditProperties.connect("button-press-event",
+             #                                      self.editButton,
+              #                                     self.cont,
+               #                                    b)
             self.fixed.put(b, self.save[self.cont][0], self.save[self.cont][1])
             self.window.show_all()
 
@@ -379,8 +380,8 @@ class CustomKey:
         #self.fixed.show_all()
         print self.selected
 
-    def editButton(self, widget, event, key, button):
-        print key
+    def editButton(self, widget, event):
+        pass
 
 if __name__ == "__main__":
     CustomKey()

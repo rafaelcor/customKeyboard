@@ -286,11 +286,13 @@ class CustomKey:
             self.editing = False
 
     def onButtonDoubleClick(self, widget, event, key):
+        print widget
         self.editing = True
         print ("2 clicked")
         if widget.get_child() is not None:
             widget.remove(widget.get_child())
         entry = Gtk.Entry()
+        entry.set_width_chars(5)
 
         if self.save[key][4] != "":
             entry.set_text(self.save[key][4])
@@ -298,6 +300,7 @@ class CustomKey:
         self.window.set_focus(entry)
         entry.grab_focus()
         entry.connect("key-press-event", self.change_name, key, widget)
+        #entry.connect("focus-out-event", self.change_name2, key, widget)
         widget.add(entry)
         widget.show_all()
         #entry.set_size_request(50, 50)
@@ -334,7 +337,7 @@ class CustomKey:
         self.cont += 1
 
     def onButtonPress(self, widget, event, key, menu):
-        if event.type == Gdk.EventType._2BUTTON_PRESS:
+        if event.type == Gdk.EventType._2BUTTON_PRESS and not self.editing:
             self.onButtonDoubleClick(widget, event, key)
 
         elif event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:

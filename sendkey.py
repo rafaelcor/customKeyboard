@@ -82,7 +82,7 @@ altkey = display.keysym_to_keycode(Xlib.XK.XK_Alt_L)
 shiftkey = display.keysym_to_keycode(Xlib.XK.XK_Shift_L)
 
 
-def sendkey(keystroke):
+def sendkey(x, keystroke):
     ctrl = alt = shift = 0
     key = ""
     splitted = keystroke.split(" ")

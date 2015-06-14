@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Copyright (C) 2015 Rafael Cordano <rafael.cordano@gmail.com>
 # Copyright (C) 2015 Ezequiel Pereira <ezequi>
 #
@@ -131,10 +132,9 @@ class CustomKey:
             button.show()
             if self.save[key][5].split("->")[0] == "Write":
                 print "---"
-                toSimulate =  self.save[key][5].split("->")[1]
+                toSimulate = self.save[key][5].split("->")[1]
                 print "---"
-                button.connect("clicked", lambda x: sendkey.sendkey(
-                                          toSimulate))
+                button.connect("clicked", sendkey.sendkey, toSimulate)
             elif self.save[key][5].split("->")[0] == "Speak":
                 button.connect("clicked", lambda x: os.system("espeak -ves '%s'"
                                           % self.save[key][5].split("->")[1]))
@@ -443,6 +443,7 @@ class CustomKey:
             print self.save[selected]
 
         self.init()
+        print "SAVE: ", self.save
 
 
 if __name__ == "__main__":

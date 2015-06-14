@@ -118,7 +118,7 @@ class CustomKey:
         window.show_all()
 
     def run(self, event):
-        self.window2 = Gtk.Window()
+        self.window2 = Gtk.Window(Gtk.WindowType.POPUP)
         self.fixed2 = Gtk.Fixed()
         self.window2.add(self.fixed2)
         self.window2.show_all()
@@ -130,8 +130,11 @@ class CustomKey:
             self.fixed2.put(button, self.save[key][0], self.save[key][1])
             button.show()
             if self.save[key][5].split("->")[0] == "Write":
+                print "---"
+                toSimulate =  self.save[key][5].split("->")[1]
+                print "---"
                 button.connect("clicked", lambda x: sendkey.sendkey(
-                                          self.save[key][5].split("->")[1]))
+                                          toSimulate))
             elif self.save[key][5].split("->")[0] == "Speak":
                 button.connect("clicked", lambda x: os.system("espeak -ves '%s'"
                                           % self.save[key][5].split("->")[1]))
@@ -390,7 +393,8 @@ class CustomKey:
         hbox1.add(self.contentEntry)
 
         hbox2 = Gtk.HBox()
-
+        dirAc = {"Write" : 0,   "Speak" :1,
+                 "Open Program" : 2, "System Action" :3}
         editVBox = Gtk.VBox()
         editButtonWindow.add(editVBox)
         name_store = Gtk.ListStore(int, str)
@@ -402,8 +406,15 @@ class CustomKey:
         actions = Gtk.ComboBox.new_with_model_and_entry(name_store)
         #name_combo.connect("changed", self.on_name_combo_changed)
         actions.set_entry_text_column(1)
+        actions.set_active(0)
+
+
 
         self.entryCombo = Gtk.Entry()
+
+        if self.save[self.selected][5].split("->")[0] != "":
+            actions.set_active(dirAc[self.save[self.selected][5].split("->")[0]])
+            self.entryCombo.set_text(self.save[self.selected][5].split("->")[1])
 
         hbox2.add(actions)
         hbox2.add(self.entryCombo)

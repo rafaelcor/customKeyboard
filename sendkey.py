@@ -97,15 +97,17 @@ def sendkey(keystroke):
             key = char_to_keycode(" ")
         else:  # an ordinary key
             for char in stroke:
-                key = char_to_keycode(stroke)
+                key = char_to_keycode(char)
+                Xlib.ext.xtest.fake_input(display, Xlib.X.KeyPress, key)
+                Xlib.ext.xtest.fake_input(display, Xlib.X.KeyRelease, key)
     if ctrl==1:
         Xlib.ext.xtest.fake_input(display, Xlib.X.KeyPress, ctrlkey)
     if alt==1:
         Xlib.ext.xtest.fake_input(display, Xlib.X.KeyPress, altkey)
     if shift==1:
         Xlib.ext.xtest.fake_input(display, Xlib.X.KeyPress, shiftkey)
-    Xlib.ext.xtest.fake_input(display, Xlib.X.KeyPress, key)
-    Xlib.ext.xtest.fake_input(display, Xlib.X.KeyRelease, key)
+    #Xlib.ext.xtest.fake_input(display, Xlib.X.KeyPress, key)
+    #Xlib.ext.xtest.fake_input(display, Xlib.X.KeyRelease, key)
     if ctrl==1:
         Xlib.ext.xtest.fake_input(display, Xlib.X.KeyRelease, ctrlkey)
     if alt==1:

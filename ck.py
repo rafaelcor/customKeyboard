@@ -15,10 +15,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-import json
 
+#! /usr/bin/env python
+import os
+import json
 from gi.repository import Gtk, Gdk
-#import gobject
+
+import sendkey
+
 
 INITIAL_X, INITIAL_Y = 0, 50
 INITIAL_W, INITIAL_H = 50, 50
@@ -54,21 +58,6 @@ UI_INFO = """
 class CustomKey:
     def __init__(self):
         self.editing = False
-        """
-        self.menu_items = (
-            ("/_File",         None,         None, 0, "<Branch>"),
-            ("/File/_New",     "<control>N", None, 0, None),
-            ("/File/_Open",    "<control>O", self.openFromJSON, 0, None ),
-            ("/File/_Save",    "<control>S", None, 0, None ),
-            ("/File/Save _As", None,         self.saveToJSON, 0, None ),
-            ("/File/sep1",     None,         None, 0, "<Separator>" ),
-            ("/File/Quit",     "<control>Q", Gtk.main_quit, 0, None ),
-            ("/_Options",      None,         None, 0, "<Branch>" ),
-            ("/Options/Run keyboard",  "<control>R", self.run , 0, None ),
-            ("/_Help",         None,         None, 0, "<LastBranch>" ),
-            ("/_Help/About",   None,         None, 0, None ),
-            )
-        """
         ####Main Menu
         action_group = Gtk.ActionGroup("my_actions")
         self.add_file_menu_actions(action_group)
@@ -140,7 +129,14 @@ class CustomKey:
             button.set_size_request(self.save[key][2], self.save[key][3])
             self.fixed2.put(button, self.save[key][0], self.save[key][1])
             button.show()
-        pass
+            if self.save[key][5].split("->")[0] == "Write":
+                button.connect("clicked", lambda x: sendkey.sendkey(
+                                          self.save[key][5].split("->")[1]))
+            elif self.save[key][5].split("->")[0] == "Speak":
+                button.connect("clicked", lambda x: os.system("espeak -ves '%s'"
+                                          % self.save[key][5].split("->")[1]))
+            elif self.save[key][5].split("->")[0] == "System Action":
+                pass
 
     def init(self):
         for child in self.fixed.get_children():
@@ -292,7 +288,7 @@ class CustomKey:
         if widget.get_child() is not None:
             widget.remove(widget.get_child())
         entry = Gtk.Entry()
-        entry.set_width_chars(5)
+        entry.set_width_chars(0)
 
         if self.save[key][4] != "":
             entry.set_text(self.save[key][4])
@@ -316,7 +312,7 @@ class CustomKey:
             except:
                 x, y = INITIAL_X, INITIAL_Y
                 w, h = INITIAL_W, INITIAL_H
-            self.save[self.cont] = [x + w, y, 50, 50, ""]
+            self.save[self.cont] = [x + w, y, 50, 50, "", ""]
 
             b = Gtk.EventBox()
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
@@ -384,7 +380,59 @@ class CustomKey:
         print self.selected
 
     def editButton(self, widget, event):
-        pass
+        editButtonWindow = Gtk.Window()
+
+        hbox1 = Gtk.HBox()
+        contentLabel = Gtk.Label("Content: ")
+        self.contentEntry = Gtk.Entry()
+        self.contentEntry.set_text("%s" % self.save[self.selected][4])
+        hbox1.add(contentLabel)
+        hbox1.add(self.contentEntry)
+
+        hbox2 = Gtk.HBox()
+
+        editVBox = Gtk.VBox()
+        editButtonWindow.add(editVBox)
+        name_store = Gtk.ListStore(int, str)
+        name_store.append([1, "Write"])
+        name_store.append([11, "Speak"])
+        name_store.append([12, "Open Program"])
+        name_store.append([2, "System Action"])
+
+        actions = Gtk.ComboBox.new_with_model_and_entry(name_store)
+        #name_combo.connect("changed", self.on_name_combo_changed)
+        actions.set_entry_text_column(1)
+
+        self.entryCombo = Gtk.Entry()
+
+        hbox2.add(actions)
+        hbox2.add(self.entryCombo)
+
+        saveButton = Gtk.Button("Save changes")
+        saveButton.connect("clicked", self.saveEdit, actions, self.selected)
+        editVBox.add(hbox1)
+        editVBox.add(hbox2)
+        editVBox.add(saveButton)
+
+        editButtonWindow.show_all()
+
+    def saveEdit(self, widget, actions, selected):
+        model = actions.get_model()
+
+        print self.save[selected][4]
+
+        if self.entryCombo.get_text() != "":
+            print model[actions.get_active_iter()][1]
+            print self.save[selected]
+            self.save[selected][5] = "{0}->{1}".format(
+                model[actions.get_active_iter()][1],
+                self.entryCombo.get_text())
+            self.save[selected][4] = self.contentEntry.get_text()
+
+            print self.save[selected]
+
+        self.init()
+
 
 if __name__ == "__main__":
     CustomKey()

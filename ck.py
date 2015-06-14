@@ -118,8 +118,12 @@ class CustomKey:
         self.eventbox.add(self.fixed)
         window.show_all()
 
+    def cancel(self, widget, event):
+        print "no focus!!"
+        widget.present()
     def run(self, event):
-        self.window2 = Gtk.Window(Gtk.WindowType.POPUP)
+        self.window2 = Gtk.Window(Gtk.WindowType.TOPLEVEL)
+        self.window2.connect("focus-out-event", self.cancel)
         self.fixed2 = Gtk.Fixed()
         self.window2.add(self.fixed2)
         self.window2.show_all()

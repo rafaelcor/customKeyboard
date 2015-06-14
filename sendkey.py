@@ -59,18 +59,19 @@ special_X_keysyms = {
 }
 
 
-def get_keysym(ch) :
+def get_keysym(ch):
     keysym = Xlib.XK.string_to_keysym(ch)
-    if keysym == 0 :
+    if keysym == 0:
         # Unfortunately, although this works to get the correct keysym
         # i.e. keysym for '#' is returned as "numbersign"
         # the subsequent display.keysym_to_keycode("numbersign") is 0.
         keysym = Xlib.XK.string_to_keysym(special_X_keysyms[ch])
     return keysym
 
-def char_to_keycode(ch) :
+
+def char_to_keycode(ch):
     keysym = get_keysym(ch)
-#    print keysym
+    print keysym
     keycode = display.keysym_to_keycode(keysym)
 #    if keycode == 0 :
 #        print "Sorry, can't map", ch
@@ -116,3 +117,8 @@ def sendkey(x, keystroke):
         Xlib.ext.xtest.fake_input(display, Xlib.X.KeyRelease, shiftkey)
     display.sync()
 
+
+print char_to_keycode("!")
+print char_to_keycode("1")
+print display.keysym_to_keycode(33)
+print display.keysym_to_keycode(49)

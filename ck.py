@@ -118,10 +118,13 @@ class CustomKey:
         self.eventbox.add(self.fixed)
         window.show_all()
 
+    def cancel(self, widget, event):
+        print "no focus!!"
+        widget.present()
+
     def run(self, event):
-        self.window2 = Gtk.Window()
-        self.window2.set_keep_above(True)
-        self.window2.set_accept_focus(False)
+        self.window2 = Gtk.Window(Gtk.WindowType.TOPLEVEL)
+        self.window2.connect("focus-out-event", self.cancel)
         self.fixed2 = Gtk.Fixed()
         self.window2.add(self.fixed2)
         self.window2.show_all()
@@ -149,9 +152,12 @@ class CustomKey:
         for key in self.save:
             self.bb = Gtk.EventBox()
             self.bb.set_border_width(1)
-            self.bb.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
-                                                              green=65535,
-                                                              blue=65535))
+            try:
+                self.bb.modify_bg(Gtk.StateFlags.NORMAL, self.save[key][6])
+            except:
+                self.bb.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
+                                                                  green=65535,
+                                                                  blue=65535))
             self.bb.set_size_request(self.save[key][2], self.save[key][3])
 
             self.bb.connect('button-press-event', self.onButtonPress, key, self.menu)
@@ -317,7 +323,7 @@ class CustomKey:
             except:
                 x, y = INITIAL_X, INITIAL_Y
                 w, h = INITIAL_W, INITIAL_H
-            self.save[self.cont] = [x + w, y, 50, 50, "", ""]
+            self.save[self.cont] = [x + w, y, 50, 50, "", "", ""]
 
             b = Gtk.EventBox()
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
@@ -421,10 +427,14 @@ class CustomKey:
         hbox2.add(actions)
         hbox2.add(self.entryCombo)
 
+        self.colorSelector = Gtk.ColorSelection()
+
+
         saveButton = Gtk.Button("Save changes")
         saveButton.connect("clicked", self.saveEdit, actions, self.selected)
         editVBox.add(hbox1)
         editVBox.add(hbox2)
+        editVBox.add(self.colorSelector)
         editVBox.add(saveButton)
 
         editButtonWindow.show_all()
@@ -440,9 +450,10 @@ class CustomKey:
             self.save[selected][5] = "{0}->{1}".format(
                 model[actions.get_active_iter()][1],
                 self.entryCombo.get_text())
-            self.save[selected][4] = self.contentEntry.get_text()
 
             print self.save[selected]
+        self.save[selected][4] = self.contentEntry.get_text()
+        self.save[selected][6] = self.colorSelector.get_current_color()
 
         self.init()
         print "SAVE: ", self.save

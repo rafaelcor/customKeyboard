@@ -20,7 +20,7 @@
 #! /usr/bin/env python
 import os
 import json
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, Pango
 
 import sendkey
 
@@ -158,6 +158,11 @@ class CustomKey:
                 self.bb.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
                                                                   green=65535,
                                                                   blue=65535))
+            try:
+                self.bb.modify_font(Pango.FontDescription(self.save[key][7]))
+            except Exception as e:
+                print "problems setting font"
+                print e
             self.bb.set_size_request(self.save[key][2], self.save[key][3])
 
             self.bb.connect('button-press-event', self.onButtonPress, key, self.menu)
@@ -323,7 +328,7 @@ class CustomKey:
             except:
                 x, y = INITIAL_X, INITIAL_Y
                 w, h = INITIAL_W, INITIAL_H
-            self.save[self.cont] = [x + w, y, 50, 50, "", "", ""]
+            self.save[self.cont] = [x + w, y, 50, 50, "", "", "", ""]
 
             b = Gtk.EventBox()
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
@@ -428,6 +433,7 @@ class CustomKey:
         hbox2.add(self.entryCombo)
 
         self.colorSelector = Gtk.ColorSelection()
+        self.fontSelector = Gtk.FontSelection()
 
 
         saveButton = Gtk.Button("Save changes")
@@ -435,6 +441,7 @@ class CustomKey:
         editVBox.add(hbox1)
         editVBox.add(hbox2)
         editVBox.add(self.colorSelector)
+        editVBox.add(self.fontSelector)
         editVBox.add(saveButton)
 
         editButtonWindow.show_all()
@@ -454,6 +461,7 @@ class CustomKey:
             print self.save[selected]
         self.save[selected][4] = self.contentEntry.get_text()
         self.save[selected][6] = self.colorSelector.get_current_color()
+        self.save[selected][7] = self.fontSelector.get_font_name()
 
         self.init()
         print "SAVE: ", self.save

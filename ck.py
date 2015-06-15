@@ -87,10 +87,15 @@ class CustomKey:
                                     )
 
         self.menu = Gtk.Menu()
+        self.menu_addImage = Gtk.MenuItem("Add Image")
         self.menu_optionEditProperties = Gtk.MenuItem("Edit Properties")
         self.menu_deleteButton = Gtk.MenuItem("Remove Button")
+        self.menu.add(self.menu_addImage)
         self.menu.add(self.menu_optionEditProperties)
         self.menu.add(self.menu_deleteButton)
+        self.menu_addImage.connect("button-press-event",
+                                   self.invokeImageDialog
+                                   )
         self.menu_deleteButton.connect("button-press-event",
                                         self.removeButton)
 
@@ -134,6 +139,21 @@ class CustomKey:
             button = Gtk.Button(self.save[key][4])
             button.set_size_request(self.save[key][2], self.save[key][3])
             self.fixed2.put(button, self.save[key][0], self.save[key][1])
+            try:
+                button.modify_bg(Gtk.StateFlags.NORMAL, self.save[key][6])
+            except:
+                self.bb.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
+                                                                  green=65535,
+                                                                  blue=65535))
+            try:
+                button.modify_font(Pango.FontDescription(self.save[key][7]))
+            except Exception as e:
+                print "problems setting font"
+                print e
+            try:
+                button.add(Gtk.Image().set_from_file(self.save[key][8]))
+            except Exception as e:
+                print e
             button.show()
             if self.save[key][5].split("->")[0] == "Write":
                 print "---"
@@ -163,6 +183,11 @@ class CustomKey:
             except Exception as e:
                 print "problems setting font"
                 print e
+            try:
+                self.bb.add(Gtk.Image().set_from_file(self.save[key][8]))
+            except Exception as e:
+                print e
+
             self.bb.set_size_request(self.save[key][2], self.save[key][3])
 
             self.bb.connect('button-press-event', self.onButtonPress, key, self.menu)
@@ -324,11 +349,11 @@ class CustomKey:
             try:
                 x, y = self.save[self.save.keys()[-1]][0:2]
                 w, h = self.save[self.save.keys()[-1]][2:4]
-                print w,h
+                print w, h
             except:
                 x, y = INITIAL_X, INITIAL_Y
                 w, h = INITIAL_W, INITIAL_H
-            self.save[self.cont] = [x + w, y, 50, 50, "", "", "", ""]
+            self.save[self.cont] = [x + w, y, 50, 50, "", "", "", "", ""]
 
             b = Gtk.EventBox()
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
@@ -388,6 +413,26 @@ class CustomKey:
             pass
     """
 
+    def invokeImageDialog(self, widget, event):
+        imageDialog = Gtk.FileChooserDialog("Open Image", None,
+         Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+         Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        imageFilter = Gtk.FileFilter()
+        imageFilter.set_name("Image Files")
+        imageFilter.add_pattern("*.jpg")
+        imageFilter.add_pattern("*.jpeg")
+        imageFilter.add_pattern("*.png")
+        imageDialog.add_filter(imageFilter)
+        response = imageDialog.run()
+        if response == Gtk.ResponseType.OK:
+            fileName = imageDialog.get_filename()
+            print fileName
+            self.save[self.selected][8] = fileName
+            self.window.show_all()
+        elif response == Gtk.RESPONSE_CANCEL:
+            pass
+        imageDialog.destroy()
+
     def removeButton(self, widget, event):
         self.save.pop(self.selected)
         self.init()
@@ -434,7 +479,14 @@ class CustomKey:
 
         self.colorSelector = Gtk.ColorSelection()
         self.fontSelector = Gtk.FontSelection()
-
+        try:
+            self.colorSelector.set_current_color(self.save[self.selected][6])
+        except:
+            pass
+        try:
+            self.fontSelector.set_font_name(self.save[self.selected][7])
+        except:
+            pass
 
         saveButton = Gtk.Button("Save changes")
         saveButton.connect("clicked", self.saveEdit, actions, self.selected)

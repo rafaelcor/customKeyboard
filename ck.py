@@ -142,7 +142,7 @@ class CustomKey:
             try:
                 button.modify_bg(Gtk.StateFlags.NORMAL, self.save[key][6])
             except:
-                self.bb.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
+                button.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
                                                                   green=65535,
                                                                   blue=65535))
             try:
@@ -184,7 +184,10 @@ class CustomKey:
                 print "problems setting font"
                 print e
             try:
-                self.bb.add(Gtk.Image().set_from_file(self.save[key][8]))
+                img = Gtk.Image()
+                img.set_from_file(self.save[key][8])
+                img.show_all()
+                self.bb.add(img)
             except Exception as e:
                 print e
 

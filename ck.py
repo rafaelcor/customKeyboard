@@ -20,7 +20,7 @@
 #! /usr/bin/env python
 import os
 import json
-from gi.repository import Gtk, Gdk, Pango
+from gi.repository import Gtk, Gdk, Pango, GdkPixbuf
 
 import sendkey
 
@@ -151,7 +151,19 @@ class CustomKey:
                 print "problems setting font"
                 print e
             try:
-                button.add(Gtk.Image().set_from_file(self.save[key][8]))
+                if self.save[key][8] != "":
+                    button.remove(button.get_child())
+                    print type(self.save[key][8])
+                    img = Gtk.Image()
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                                                          self.save[key][8],
+                                                          self.save[key][2],
+                                                          self.save[key][3]
+                                                          )
+                    img.set_from_pixbuf(pixbuf)
+                    img.show_all()
+                    button.add(img)
+                    button.show_all()
             except Exception as e:
                 print e
             button.show()
@@ -184,10 +196,17 @@ class CustomKey:
                 print "problems setting font"
                 print e
             try:
-                img = Gtk.Image()
-                img.set_from_file(self.save[key][8])
-                img.show_all()
-                self.bb.add(img)
+                if self.save[key][8] != "":
+                    print type(self.save[key][8])
+                    img = Gtk.Image()
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
+                                                          self.save[key][8],
+                                                          self.save[key][2],
+                                                          self.save[key][3]
+                                                          )
+                    img.set_from_pixbuf(pixbuf)
+                    img.show_all()
+                    self.bb.add(img)
             except Exception as e:
                 print e
 
@@ -435,6 +454,7 @@ class CustomKey:
         elif response == Gtk.RESPONSE_CANCEL:
             pass
         imageDialog.destroy()
+        self.init()
 
     def removeButton(self, widget, event):
         self.save.pop(self.selected)

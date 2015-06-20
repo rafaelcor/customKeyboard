@@ -22,6 +22,7 @@ import os
 import zipfile
 import json
 from gi.repository import Gtk, Gdk, Pango, GdkPixbuf
+import customWidgets
 
 import sendkey
 
@@ -222,6 +223,49 @@ class CustomKey:
             self.bb.add(Gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
         self.fixed.show_all()
+
+    def configKeyboard(self, widget):
+        window3 = Gtk.Window()
+
+        vbox1 = Gtk.VBox()
+
+        wadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
+        widthSpinButton = customWidgets.SpinButtonWithLabel("Width: ")
+        widthSpinButton.set_adjustment(wadjustment)
+
+        hadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
+        heigthSpinButton = customWidgets.SpinButtonWithLabel("Heigth: ")
+        heigthSpinButton.set_adjustment(hadjustment)
+
+        pxadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
+        posXSpinButton = customWidgets.SpinButtonWithLabel("PosX: ")
+        posXSpinButton.set_adjustment(pxadjustment)
+
+        pyadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
+        posYSpinButton = customWidgets.SpinButtonWithLabel("PosY: ")
+        posYSpinButton.set_adjustment(pyadjustment)
+
+        vbox1.add(widthSpinButton)
+        vbox1.add(heigthSpinButton)
+        vbox1.add(posXSpinButton)
+        vbox1.add(posYSpinButton)
+
+        vbox2 = Gtk.VBox()
+
+        resizableCheckButton = Gtk.CheckButton("Resizable")
+        responsiveCheckButton = Gtk.CheckButton("Responsive")
+
+        vbox2.add(resizableCheckButton)
+        vbox2.add(responsiveCheckButton)
+
+        hbox1 = Gtk.HBox()
+
+        hbox1.add(vbox1)
+        hbox1.add(vbox2)
+
+        window3.add(hbox1)
+        window3.show_all()
+
 
     def test(self, widget, event):
         pass

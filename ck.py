@@ -19,6 +19,7 @@
 
 #! /usr/bin/env python
 import os
+import zipfile
 import json
 from gi.repository import Gtk, Gdk, Pango, GdkPixbuf
 
@@ -41,6 +42,7 @@ UI_INFO = """
     </menu>
     <menu action='OptionMenu'>
       <menuitem action='OptionRunKeyboard' />
+      <menuitem action='OptionSetKeyboardWindow' />
     </menu>
     <menu action='HelpMenu'>
       <menuitem action='Help'/>
@@ -226,7 +228,13 @@ class CustomKey:
         #if event.x <= 25:
          #   widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.SIZING))
 
-    def openFromJSON(self, data):
+    def getScreenInfo(self):
+        screen = Gdk.Screen.get_default()
+        screenInfo = {"width": screen.get_width(),
+                      "heigth": screen.get_height()}
+        return screenInfo
+
+    def openFromKeyboard(self, data):
         fileChooserDialog = Gtk.FileChooserDialog("Save Keyboard", None,
          Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
          Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -238,16 +246,16 @@ class CustomKey:
         if response == Gtk.ResponseType.OK:
             fileName = fileChooserDialog.get_filename()
             print fileName
-            f = open(fileName, "r")
-            fr = f.readlines()
-            self.save = json.loads(fr[0])
+            f = zipfile.ZipFile(fileName, "r")
+            fr = f.read("teclado.k")
+            self.save = json.loads(fr)
             self.init()
             self.window.show_all()
         elif response == Gtk.RESPONSE_CANCEL:
             pass
         fileChooserDialog.destroy()
 
-    def saveToJSON(self, widget):
+    def saveAllToZip(self, widget):
         fileChooserDialog = Gtk.FileChooserDialog("Save Keyboard", None,
          Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
          Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -255,16 +263,31 @@ class CustomKey:
         if response == Gtk.ResponseType.OK:
             fileName = fileChooserDialog.get_filename()
             print fileName
-            if not fileName.endswith('.keyboard'):
-                fileName += ".keyboard"
-            f = open(fileName, "w")
+            f = open("teclado.k", "w")
             f.write(json.dumps(self.save))
+            print self.save
+            f.close()
 
         elif response == Gtk.ResponseType.CANCEL:
             pass
+
         fileChooserDialog.destroy()
 
-        pass
+        if not fileName.endswith('.keyboard'):
+                fileName += ".keyboard"
+
+        zipFile = zipfile.ZipFile(fileName, "w")
+        zipFile.write("teclado.k")
+        infoFile = open("info.k", "w")
+        screenInfo = self.getScreenInfo()
+        infoFile.write(json.dumps(screenInfo))
+        infoFile.close()
+        zipFile.write("info.k")
+        #zipFile.write("resources/")
+        #zipFile.write("pyfiles/")
+        zipFile.close()
+        os.remove("teclado.k")
+        os.remove("info.k")
 
     def add_file_menu_actions(self, action_group):
         action_filemenu = Gtk.Action("FileMenu", "File", None, None)
@@ -275,20 +298,18 @@ class CustomKey:
 
         action_fileopen = Gtk.Action("FileOpen", None, None, Gtk.STOCK_OPEN)
         action_group.add_action(action_fileopen)
-        action_fileopen.connect("activate", self.openFromJSON)
+        action_fileopen.connect("activate", self.openFromKeyboard)
 
         action_filesave = Gtk.Action("FileSave", None, None, Gtk.STOCK_SAVE)
         action_group.add_action(action_filesave)
 
         action_filesaveas = Gtk.Action("FileSaveAs", None, None, Gtk.STOCK_SAVE_AS)
         action_group.add_action(action_filesaveas)
-        action_filesaveas.connect("activate", self.saveToJSON)
+        action_filesaveas.connect("activate", self.saveAllToZip)
 
         action_filequit = Gtk.Action("FileQuit", None, None, Gtk.STOCK_QUIT)
+        action_filequit.connect("activate", Gtk.main_quit)
         action_group.add_action(action_filequit)
-
-
-
 
     def add_options_menu_actions(self, action_group):
         action_optionmenu = Gtk.Action("OptionMenu", "Options", None, None)
@@ -298,6 +319,9 @@ class CustomKey:
         action_optionrunkeyboard.connect("activate", self.run)
         action_group.add_action(action_optionrunkeyboard)
 
+        action_optionsetkeyboardwindow = Gtk.Action("OptionSetKeyboardWindow", "Config keyboard", None, None)
+        action_optionsetkeyboardwindow.connect("activate", self.configKeyboard)
+        action_group.add_action(action_optionsetkeyboardwindow)
 
     def create_ui_manager(self):
         uimanager = Gtk.UIManager()
@@ -407,8 +431,6 @@ class CustomKey:
             self.evpos = self.save[key][0:2]
             self.evpos[0] += int(event.x - 25)
             self.evpos[1] += int(event.y - 25)
-
-
 
     def onButtonRelease(self, widget, event, key):
         #print "br"

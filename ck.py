@@ -61,6 +61,7 @@ UI_INFO = """
 
 class CustomKey:
     def __init__(self):
+        self.widgets = []
         self.editing = False
         ####Main Menu
         action_group = Gtk.ActionGroup("my_actions")
@@ -112,6 +113,7 @@ class CustomKey:
 
         window.connect("key-press-event", self.new_button)
         window.connect("destroy", Gtk.main_quit)
+        window.connect("button-press-event", self.focus_out)
 
         self.vbox = Gtk.VBox(False, 1)
         self.vbox.set_border_width(1)
@@ -125,6 +127,11 @@ class CustomKey:
         self.vbox.add(self.eventbox)
         self.eventbox.add(self.fixed)
         window.show_all()
+
+    def focus_out(self, *args):
+        for widget in self.widgets:
+            if widget.can_focus_out:
+                widget.disableResize()
 
     def run(self, event):
         self.window2 = Gtk.Window()
@@ -182,7 +189,11 @@ class CustomKey:
         for child in self.fixed.get_children():
             child.destroy()
         for key in self.save:
-            self.bb = Gtk.EventBox()
+            self.bb = customWidgets.ResizableEventBox(self.fixed,
+                                                      self.save[key][0],
+                                                      self.save[key][1],
+                                                      self.save[key][2],
+                                                      self.save[key][3])
             self.bb.set_border_width(1)
             try:
                 self.bb.modify_bg(Gtk.StateFlags.NORMAL, self.save[key][6])
@@ -222,6 +233,7 @@ class CustomKey:
                #                                    self.bb)
             self.bb.add(Gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
+            self.widgets.append(self.bb)
         self.fixed.show_all()
 
     def configKeyboard(self, widget):
@@ -442,7 +454,11 @@ class CustomKey:
                 w, h = INITIAL_W, INITIAL_H
             self.save[self.cont] = [x + w, y, 50, 50, "", "", "", "", ""]
 
-            b = Gtk.EventBox()
+            b = customWidgets.ResizableEventBox(self.fixed,
+                                                      self.save[self.cont][0],
+                                                      self.save[self.cont][1],
+                                                      self.save[self.cont][2],
+                                                      self.save[self.cont][3])
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
                                                         green=65535,
                                                         blue=65535))

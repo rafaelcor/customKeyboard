@@ -71,7 +71,6 @@ def get_keysym(ch):
 
 def char_to_keycode(ch):
     keysym = get_keysym(ch)
-    print keysym
     keycode = display.keysym_to_keycode(keysym)
 #    if keycode == 0 :
 #        print "Sorry, can't map", ch
@@ -116,9 +115,3 @@ def sendkey(x, keystroke):
     if shift==1:
         Xlib.ext.xtest.fake_input(display, Xlib.X.KeyRelease, shiftkey)
     display.sync()
-
-
-print char_to_keycode("!")
-print char_to_keycode("1")
-print display.keysym_to_keycode(33)
-print display.keysym_to_keycode(49)

@@ -61,6 +61,7 @@ UI_INFO = """
 class CustomKey:
     def __init__(self):
         self.widgets = []
+        self.ids = {}
         self.editing = False
         ####Main Menu
         action_group = Gtk.ActionGroup("my_actions")
@@ -401,12 +402,16 @@ class CustomKey:
         return item_factory.get_widget("<main>")
 
     def move_key(self, widget, event, key):
+        #print event.get_click_count()[0]
+        #print dir(event)
         if not self.editing:
             self.evpos = self.save[key][0:2]
             self.evpos[0] += int(event.x - 25)
             self.evpos[1] += int(event.y - 25)
             self.fixed.move(widget, self.evpos[0], self.evpos[1])
             self.save[key][0:2] = self.evpos
+            widget.pos = [self.evpos[0], self.evpos[1], widget.pos[2], widget.pos[3]]
+            widget.relocate_handles()
 
     def change_name(self, widget, event, key, button):
         print event.keyval
@@ -464,7 +469,9 @@ class CustomKey:
             b.set_border_width(1)
             b.set_size_request(self.save[self.cont][2], self.save[self.cont][3])
             b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
-            b.connect('motion-notify-event', self.move_key, self.cont)
+            b.connect("button-release-event", self.onButtonRelease, self.cont)
+            ####b.connect('motion-notify-event', self.move_key, self.cont)
+
             #b.connect_object("event", self.onButtonRightClick, self.menu)
             #self.menu_optionEditProperties.connect("button-press-event",
              #                                      self.editButton,
@@ -476,7 +483,11 @@ class CustomKey:
         self.cont += 1
 
     def onButtonPress(self, widget, event, key, menu):
+        print event.button
+        self.ids[key] = widget.connect('motion-notify-event', self.move_key, key)
+
         if event.type == Gdk.EventType._2BUTTON_PRESS and not self.editing:
+
             self.onButtonDoubleClick(widget, event, key)
 
         elif event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
@@ -492,6 +503,8 @@ class CustomKey:
             self.evpos[1] += int(event.y - 25)
 
     def onButtonRelease(self, widget, event, key):
+        widget.disconnect(self.ids[key])
+        self.ids.pop(key)
         #print "br"
         self.pos = self.save[key][0:2]
         if (self.evpos[0] != self.pos[0] and

@@ -27,7 +27,11 @@ class ResizableEventBox(Gtk.EventBox):
         self.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
                                                         green=65535,
                                                         blue=65535))
-        self.set_events(Gdk.EventMask.POINTER_MOTION_MASK)
+        self.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
+                        Gdk.EventMask.BUTTON_MOTION_MASK |
+                        Gdk.EventMask.BUTTON1_MOTION_MASK |
+                        Gdk.EventMask.BUTTON2_MOTION_MASK |
+                        Gdk.EventMask.BUTTON3_MOTION_MASK)
         self.connect("button-press-event", self.enableResize)
         self.connect("leave-notify-event", self.set_focus_out)
         self.connect("motion-notify-event", self.set_focus_in)
@@ -138,6 +142,7 @@ class ResizableEventBox(Gtk.EventBox):
 
     def enableResize(self, widget, event):
         print "this works"
+        print event.button
         self.typec = 1
         if self.showResize:
             return
@@ -176,3 +181,8 @@ class ResizableEventBox(Gtk.EventBox):
         self.pos = [event.x, event.y, event.width, event.height]
         print self.pos
 
+    def relocate_handles(self, *args):
+        self.fixed.put(self.img1, self.pos[0], self.pos[1])
+        self.fixed.put(self.img2, self.pos[0]+self.pos[3], self.pos[1]+self.pos[2])
+        self.fixed.put(self.img3, self.pos[0], self.pos[1]+self.pos[2])
+        self.fixed.put(self.img4, self.pos[0]+self.pos[3], self.pos[1])

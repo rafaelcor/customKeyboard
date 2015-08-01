@@ -106,26 +106,37 @@ class ResizableEventBox(Gtk.EventBox):
         print "event.y: %s"%event.y
         print event.get_window().get_position()
         self.evpos = [widget.get_allocation().x, widget.get_allocation().y]
+        self.evpos[0] -= widget.get_allocation().width/2
+        self.evpos[1] -= widget.get_allocation().height/2
         print self.evpos, event.x, event.y
         if self.evpos[0] in range(0, screen.get_width()+1):
-            self.evpos[0] += int(abs(event.x) - 12)
+            self.evpos[0] += int(abs(event.x))
             self.evpos[0] = abs(self.evpos[0])
-            self.evpos[1] += int(abs(event.y) - 12)
+            self.evpos[1] += int(abs(event.y))
             self.evpos[1] = abs(self.evpos[1])
             print "E0", self.evpos
-            self.fixed.move(widget, self.evpos[0], self.evpos[1])
+            self.fixed.remove(widget)
+            self.fixed.put(widget, self.evpos[0], self.evpos[1])
         if widget == self.img1:
-            self.fixed.move(self.img3, self.evpos[0], self.img3.get_allocation().y)
-            self.fixed.move(self.img4, self.img4.get_allocation().x, self.evpos[1])
+            self.fixed.remove(self.img3)
+            self.fixed.remove(self.img4)
+            self.fixed.put(self.img3, self.evpos[0], self.img3.get_allocation().y)
+            self.fixed.put(self.img4, self.img4.get_allocation().x, self.evpos[1])
         if widget == self.img2:
-            self.fixed.move(self.img4, self.evpos[0], self.img4.get_allocation().y)
-            self.fixed.move(self.img3, self.img3.get_allocation().x, self.evpos[1])
+            self.fixed.remove(self.img3)
+            self.fixed.remove(self.img4)
+            self.fixed.put(self.img4, self.evpos[0], self.img4.get_allocation().y)
+            self.fixed.put(self.img3, self.img3.get_allocation().x, self.evpos[1])
         if widget == self.img3:
-            self.fixed.move(self.img1, self.evpos[0], self.img1.get_allocation().y)
-            self.fixed.move(self.img2, self.img2.get_allocation().x, self.evpos[1])
+            self.fixed.remove(self.img1)
+            self.fixed.remove(self.img2)
+            self.fixed.put(self.img1, self.evpos[0], self.img1.get_allocation().y)
+            self.fixed.put(self.img2, self.img2.get_allocation().x, self.evpos[1])
         if widget == self.img4:
-            self.fixed.move(self.img2, self.evpos[0], self.img2.get_allocation().y)
-            self.fixed.move(self.img1, self.img1.get_allocation().x, self.evpos[1])
+            self.fixed.remove(self.img1)
+            self.fixed.remove(self.img2)
+            self.fixed.put(self.img2, self.evpos[0], self.img2.get_allocation().y)
+            self.fixed.put(self.img1, self.img1.get_allocation().x, self.evpos[1])
 
         x = self.img1.get_allocation().x
         y = self.img1.get_allocation().y
@@ -182,7 +193,7 @@ class ResizableEventBox(Gtk.EventBox):
         print self.pos
 
     def relocate_handles(self, *args):
-        self.fixed.put(self.img1, self.pos[0], self.pos[1])
-        self.fixed.put(self.img2, self.pos[0]+self.pos[3], self.pos[1]+self.pos[2])
-        self.fixed.put(self.img3, self.pos[0], self.pos[1]+self.pos[2])
-        self.fixed.put(self.img4, self.pos[0]+self.pos[3], self.pos[1])
+        self.fixed.move(self.img1, self.pos[0], self.pos[1])
+        self.fixed.move(self.img2, self.pos[0]+self.pos[3], self.pos[1]+self.pos[2])
+        self.fixed.move(self.img3, self.pos[0], self.pos[1]+self.pos[2])
+        self.fixed.move(self.img4, self.pos[0]+self.pos[3], self.pos[1])

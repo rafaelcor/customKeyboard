@@ -29,6 +29,7 @@ import sendkey
 INITIAL_X, INITIAL_Y = 0, 50
 INITIAL_W, INITIAL_H = 50, 50
 
+
 UI_INFO = """
 <ui>
   <menubar name='MenuBar'>

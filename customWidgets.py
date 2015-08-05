@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+ENABLE_HANDLES = False
 from gi.repository import Gtk, Gdk, GdkPixbuf
 
 
@@ -32,7 +33,8 @@ class ResizableEventBox(Gtk.EventBox):
                         Gdk.EventMask.BUTTON1_MOTION_MASK |
                         Gdk.EventMask.BUTTON2_MOTION_MASK |
                         Gdk.EventMask.BUTTON3_MOTION_MASK)
-        self.connect("button-press-event", self.enableResize)
+        if ENABLE_HANDLES:
+            self.connect("button-press-event", self.enableResize)
         self.connect("leave-notify-event", self.set_focus_out)
         self.connect("motion-notify-event", self.set_focus_in)
         self.connect("size-allocate", self.resized)

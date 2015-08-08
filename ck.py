@@ -262,28 +262,29 @@ class CustomKey:
                                                                  self.windowKeyboardSize[1],
                                                                  self.windowKeyboardSize[2],
                                                                  self.windowKeyboardSize[3])
+        modernWindow.set_keep_above(True)
         window3.connect("destroy", lambda x: modernWindow.destroy())
-        self.wadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        self.wadjustment = Gtk.Adjustment(0, 0, 5000, 10, 10, 0)
         widthSpinButton = customWidgets.SpinButtonWithLabel(_("Width: "))
         self.wadjustment.connect("value_changed", self.onChangeSpin, 1, modernWindow)
         widthSpinButton.set_adjustment(self.wadjustment)
         print self.windowKeyboardSize[0]
         self.wadjustment.set_value(self.windowKeyboardSize[0])
 
-        self.hadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        self.hadjustment = Gtk.Adjustment(0, 0, 5000, 10, 10, 0)
         heigthSpinButton = customWidgets.SpinButtonWithLabel(_("Heigth: "))
         self.hadjustment.connect("value_changed", self.onChangeSpin, 2, modernWindow)
         heigthSpinButton.set_adjustment(self.hadjustment)
         print self.windowKeyboardSize[1]
         self.hadjustment.set_value(self.windowKeyboardSize[1])
 
-        self.pxadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        self.pxadjustment = Gtk.Adjustment(0, 0, 5000, 10, 10, 0)
         posXSpinButton = customWidgets.SpinButtonWithLabel(_("PosX: "))
         self.pxadjustment.connect("value_changed", self.onChangeSpin, 3, modernWindow)
         posXSpinButton.set_adjustment(self.pxadjustment)
         self.pxadjustment.set_value(self.windowKeyboardSize[2])
 
-        self.pyadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        self.pyadjustment = Gtk.Adjustment(0, 0, 5000, 10, 10, 0)
         posYSpinButton = customWidgets.SpinButtonWithLabel(_("PosY: "))
         self.pyadjustment.connect("value_changed", self.onChangeSpin, 4, modernWindow)
         posYSpinButton.set_adjustment(self.pyadjustment)

@@ -255,13 +255,14 @@ class CustomKey:
     def configKeyboard(self, widget):
         window3 = Gtk.Window()
 
+
         vbox1 = Gtk.VBox()
 
         modernWindow = customWidgets.TransparentWindowWithBorder(self.windowKeyboardSize[0],
                                                                  self.windowKeyboardSize[1],
                                                                  self.windowKeyboardSize[2],
                                                                  self.windowKeyboardSize[3])
-
+        window3.connect("destroy", lambda x: modernWindow.destroy())
         self.wadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
         widthSpinButton = customWidgets.SpinButtonWithLabel(_("Width: "))
         self.wadjustment.connect("value_changed", self.onChangeSpin, 1, modernWindow)

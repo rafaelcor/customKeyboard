@@ -1,0 +1,95 @@
+# Spanish translations for PACKAGE package
+# Traducciones al español para el paquete PACKAGE.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Rafael Cordano <rafaelcor@thinkpython.uy>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-08-07 19:04-0300\n"
+"PO-Revision-Date: 2015-08-07 19:05-0300\n"
+"Last-Translator: Rafael Cordano <rafaelcor@thinkpython.uy>\n"
+"Language-Team: Spanish\n"
+"Language: es_UY\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ck.py:27
+msgid "hello, world!"
+msgstr ""
+
+#: ck.py:104
+msgid "Add Image"
+msgstr "Agregar imagen"
+
+#: ck.py:105
+msgid "Edit Properties"
+msgstr "Editar propiedades"
+
+#: ck.py:106
+msgid "Remove Button"
+msgstr "Borrar botón"
+
+#: ck.py:168 ck.py:217
+msgid "problems setting font"
+msgstr "problemas configurando fuente"
+
+#: ck.py:255
+msgid "Width: "
+msgstr "Ancho"
+
+#: ck.py:259
+msgid "Heigth: "
+msgstr "Alto"
+
+#: ck.py:263
+msgid "PosX: "
+msgstr "PosX: "
+
+#: ck.py:267
+msgid "PosY: "
+msgstr "PosY: "
+
+#: ck.py:277
+msgid "Resizable"
+msgstr "Redimensionable"
+
+#: ck.py:278
+msgid "Responsive"
+msgstr "Responsivo"
+
+#: ck.py:279
+msgid "Save Changes"
+msgstr "Guardar Cambios"
+
+#: ck.py:306 ck.py:327
+msgid "Save Keyboard"
+msgstr "Guardar teclado"
+
+#: ck.py:310
+msgid "Keyboard Files"
+msgstr "Archivos de teclado"
+
+#: ck.py:506
+msgid "right click"
+msgstr "click derecho"
+
+#: ck.py:542
+msgid "Open Image"
+msgstr "Abrir Imagen"
+
+#: ck.py:546
+msgid "Image Files"
+msgstr "Archivos de Imagen"
+
+#: ck.py:573
+msgid "Content: "
+msgstr "Contenido: "
+
+#: ck.py:617
+msgid "Save changes"
+msgstr "Guardar Cambios"

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-ENABLE_HANDLES = False
+ENABLE_HANDLES = True
 from gi.repository import Gtk, Gdk, GdkPixbuf
 
 
@@ -24,6 +24,7 @@ class ResizableEventBox(Gtk.EventBox):
         self.showResize = False
         self.lock = False
         self.can_focus_out = True
+        self.dragevent = 0
         self.screen = Gdk.Screen.get_default()
         self.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
                                                         green=65535,
@@ -152,6 +153,7 @@ class ResizableEventBox(Gtk.EventBox):
 
     def disableDrag(self, widget, event):
         widget.disconnect(self.dragevent)
+        self.dragevent = 0
 
     def enableResize(self, widget, event):
         print "this works"
@@ -184,8 +186,11 @@ class ResizableEventBox(Gtk.EventBox):
         self.img3.hide()
         self.img4.hide()
 
-    def set_focus_out(self, *args):
-        self.can_focus_out = True
+    def set_focus_out(self, widget, event):
+        if not self.dragevent:
+            self.can_focus_out = True
+            return
+        self.moveResizer(widget, event)
 
     def set_focus_in(self, *args):
         self.can_focus_out = False

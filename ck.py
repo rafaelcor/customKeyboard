@@ -18,6 +18,15 @@
 #
 
 import os
+
+import gettext
+from gettext import gettext as _
+
+gettext.textdomain("lang")
+gettext.bindtextdomain("lang", "./mo")
+gettext.gettext("hello, world!")
+
+
 import zipfile
 import json
 from gi.repository import Gtk, Gdk, Pango, GdkPixbuf
@@ -61,6 +70,7 @@ UI_INFO = """
 
 class CustomKey:
     def __init__(self):
+        self.windowKeyboardSize = [500, 300, 500, 300]
         self.widgets = []
         self.ids = {}
         self.editing = False
@@ -92,9 +102,9 @@ class CustomKey:
                                     )
 
         self.menu = Gtk.Menu()
-        self.menu_addImage = Gtk.MenuItem("Add Image")
-        self.menu_optionEditProperties = Gtk.MenuItem("Edit Properties")
-        self.menu_deleteButton = Gtk.MenuItem("Remove Button")
+        self.menu_addImage = Gtk.MenuItem(_("Add Image"))
+        self.menu_optionEditProperties = Gtk.MenuItem(_("Edit Properties"))
+        self.menu_deleteButton = Gtk.MenuItem(_("Remove Button"))
         self.menu.add(self.menu_addImage)
         self.menu.add(self.menu_optionEditProperties)
         self.menu.add(self.menu_deleteButton)
@@ -136,6 +146,10 @@ class CustomKey:
 
     def run(self, event):
         self.window2 = Gtk.Window()
+        self.window2.set_size_request(self.windowKeyboardSize[0],
+                                      self.windowKeyboardSize[1])
+        self.window2.move(self.windowKeyboardSize[2],
+                          self.windowKeyboardSize[3])
         self.window2.set_keep_above(True)
         self.window2.set_accept_focus(False)
         self.fixed2 = Gtk.Fixed()
@@ -156,7 +170,7 @@ class CustomKey:
             try:
                 button.modify_font(Pango.FontDescription(self.save[key][7]))
             except Exception as e:
-                print "problems setting font"
+                print (_("problems setting font"))
                 print e
             try:
                 if self.save[key][8] != "":
@@ -205,7 +219,7 @@ class CustomKey:
             try:
                 self.bb.modify_font(Pango.FontDescription(self.save[key][7]))
             except Exception as e:
-                print "problems setting font"
+                print (_("problems setting font"))
                 print e
             try:
                 if self.save[key][8] != "":
@@ -242,21 +256,27 @@ class CustomKey:
 
         vbox1 = Gtk.VBox()
 
-        wadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
-        widthSpinButton = customWidgets.SpinButtonWithLabel("Width: ")
-        widthSpinButton.set_adjustment(wadjustment)
+        self.wadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        widthSpinButton = customWidgets.SpinButtonWithLabel(_("Width: "))
+        widthSpinButton.set_adjustment(self.wadjustment)
+        print self.windowKeyboardSize[0]
+        self.wadjustment.set_value(self.windowKeyboardSize[0])
 
-        hadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
-        heigthSpinButton = customWidgets.SpinButtonWithLabel("Heigth: ")
-        heigthSpinButton.set_adjustment(hadjustment)
+        self.hadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        heigthSpinButton = customWidgets.SpinButtonWithLabel(_("Heigth: "))
+        heigthSpinButton.set_adjustment(self.hadjustment)
+        print self.windowKeyboardSize[1]
+        self.hadjustment.set_value(self.windowKeyboardSize[1])
 
-        pxadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
-        posXSpinButton = customWidgets.SpinButtonWithLabel("PosX: ")
-        posXSpinButton.set_adjustment(pxadjustment)
+        self.pxadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        posXSpinButton = customWidgets.SpinButtonWithLabel(_("PosX: "))
+        posXSpinButton.set_adjustment(self.pxadjustment)
+        self.pxadjustment.set_value(self.windowKeyboardSize[2])
 
-        pyadjustment = Gtk.Adjustment(0, 0, 100, 1, 10, 0)
-        posYSpinButton = customWidgets.SpinButtonWithLabel("PosY: ")
-        posYSpinButton.set_adjustment(pyadjustment)
+        self.pyadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
+        posYSpinButton = customWidgets.SpinButtonWithLabel(_("PosY: "))
+        posYSpinButton.set_adjustment(self.pyadjustment)
+        self.pyadjustment.set_value(self.windowKeyboardSize[3])
 
         vbox1.add(widthSpinButton)
         vbox1.add(heigthSpinButton)
@@ -265,11 +285,15 @@ class CustomKey:
 
         vbox2 = Gtk.VBox()
 
-        resizableCheckButton = Gtk.CheckButton("Resizable")
-        responsiveCheckButton = Gtk.CheckButton("Responsive")
+        resizableCheckButton = Gtk.CheckButton(_("Resizable"))
+        responsiveCheckButton = Gtk.CheckButton(_("Responsive"))
+        buttonSave = Gtk.Button(_("Save Changes"))
+
+        buttonSave.connect("clicked", self.saveChanges)
 
         vbox2.add(resizableCheckButton)
         vbox2.add(responsiveCheckButton)
+        vbox2.add(buttonSave)
 
         hbox1 = Gtk.HBox()
 
@@ -278,6 +302,13 @@ class CustomKey:
 
         window3.add(hbox1)
         window3.show_all()
+
+    def saveChanges(self, widget): # save changes from config keyboard window
+        self.windowKeyboardSize = [self.wadjustment.get_value(),
+                                   self.hadjustment.get_value(),
+                                   self.pxadjustment.get_value(),
+                                   self.pyadjustment.get_value()]
+        print self.windowKeyboardSize
 
 
     def test(self, widget, event):
@@ -288,15 +319,19 @@ class CustomKey:
     def getScreenInfo(self):
         screen = Gdk.Screen.get_default()
         screenInfo = {"width": screen.get_width(),
-                      "heigth": screen.get_height()}
+                      "heigth": screen.get_height(),
+                      "window_width": self.windowKeyboardSize[0],
+                      "window_heigth": self.windowKeyboardSize[1],
+                      "window_posx": self.windowKeyboardSize[2],
+                      "window_posy": self.windowKeyboardSize[3]}
         return screenInfo
 
     def openFromKeyboard(self, data):
-        fileChooserDialog = Gtk.FileChooserDialog("Save Keyboard", None,
+        fileChooserDialog = Gtk.FileChooserDialog(_("Save Keyboard"), None,
          Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
          Gtk.STOCK_OK, Gtk.ResponseType.OK))
         keyboardFilter = Gtk.FileFilter()
-        keyboardFilter.set_name("Keyboard Files")
+        keyboardFilter.set_name(_("Keyboard Files"))
         keyboardFilter.add_pattern("*.keyboard")
         fileChooserDialog.add_filter(keyboardFilter)
         response = fileChooserDialog.run()
@@ -313,7 +348,7 @@ class CustomKey:
         fileChooserDialog.destroy()
 
     def saveAllToZip(self, widget):
-        fileChooserDialog = Gtk.FileChooserDialog("Save Keyboard", None,
+        fileChooserDialog = Gtk.FileChooserDialog(_("Save Keyboard"), None,
          Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
          Gtk.STOCK_OK, Gtk.ResponseType.OK))
         response = fileChooserDialog.run()
@@ -457,7 +492,10 @@ class CustomKey:
             except:
                 x, y = INITIAL_X, INITIAL_Y
                 w, h = INITIAL_W, INITIAL_H
-            self.save[self.cont] = [x + w, y, 50, 50, "", "", "", "", ""]
+            self.save[self.cont] = [((x + w)*100)/self.windowKeyboardSize[0],
+                                     (y*100)/self.windowKeyboardSize[1],
+                                     (50*100)/self.windowKeyboardSize[0],
+                                     (50*100)/self.windowKeyboardSize[1], "", "", "", "", ""]
 
             b = customWidgets.ResizableEventBox(self.fixed,
                                                       self.save[self.cont][0],
@@ -465,10 +503,11 @@ class CustomKey:
                                                       self.save[self.cont][2],
                                                       self.save[self.cont][3])
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
-                                                        green=65535,
-                                                        blue=65535))
+                                                         green=65535,
+                                                         blue=65535))
             b.set_border_width(1)
-            b.set_size_request(self.save[self.cont][2], self.save[self.cont][3])
+            b.set_size_request((self.save[self.cont][2]*self.windowKeyboardSize[0])/100,
+                                self.save[self.cont][3]*self.windowKeyboardSize[1]/100)
             b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
             b.connect("button-release-event", self.onButtonRelease, self.cont)
             ####b.connect('motion-notify-event', self.move_key, self.cont)
@@ -478,7 +517,8 @@ class CustomKey:
              #                                      self.editButton,
               #                                     self.cont,
                #                                    b)
-            self.fixed.put(b, self.save[self.cont][0], self.save[self.cont][1])
+            self.fixed.put(b, (self.save[self.cont][0]*self.windowKeyboardSize[0])/100,
+                           (self.save[self.cont][1]*self.windowKeyboardSize[1])/100)
             self.window.show_all()
 
         self.cont += 1
@@ -492,7 +532,7 @@ class CustomKey:
             self.onButtonDoubleClick(widget, event, key)
 
         elif event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-            print "right click"
+            print _("right click")
             self.selected = key
             menu.popup(None, None, None, None, 3, event.time)
             print
@@ -528,11 +568,11 @@ class CustomKey:
     """
 
     def invokeImageDialog(self, widget, event):
-        imageDialog = Gtk.FileChooserDialog("Open Image", None,
+        imageDialog = Gtk.FileChooserDialog(_("Open Image"), None,
          Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
          Gtk.STOCK_OK, Gtk.ResponseType.OK))
         imageFilter = Gtk.FileFilter()
-        imageFilter.set_name("Image Files")
+        imageFilter.set_name(_("Image Files"))
         imageFilter.add_pattern("*.jpg")
         imageFilter.add_pattern("*.jpeg")
         imageFilter.add_pattern("*.png")
@@ -559,7 +599,7 @@ class CustomKey:
         editButtonWindow = Gtk.Window()
 
         hbox1 = Gtk.HBox()
-        contentLabel = Gtk.Label("Content: ")
+        contentLabel = Gtk.Label(_("Content: "))
         self.contentEntry = Gtk.Entry()
         self.contentEntry.set_text("%s" % self.save[self.selected][4])
         hbox1.add(contentLabel)
@@ -603,7 +643,7 @@ class CustomKey:
         except:
             pass
 
-        saveButton = Gtk.Button("Save changes")
+        saveButton = Gtk.Button(_("Save changes"))
         saveButton.connect("clicked", self.saveEdit, actions, self.selected)
         editVBox.add(hbox1)
         editVBox.add(hbox2)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 ENABLE_HANDLES = True
 from gi.repository import Gtk, Gdk, GdkPixbuf
+import cairo
 
 
 class SpinButtonWithLabel(Gtk.HBox, Gtk.SpinButton):
@@ -204,3 +205,56 @@ class ResizableEventBox(Gtk.EventBox):
         self.fixed.move(self.img2, self.pos[0]+self.pos[3], self.pos[1]+self.pos[2])
         self.fixed.move(self.img3, self.pos[0], self.pos[1]+self.pos[2])
         self.fixed.move(self.img4, self.pos[0]+self.pos[3], self.pos[1])
+
+
+class TransparentWindowWithBorder(Gtk.Window):
+
+    def __init__(self, width, heigth, xpos, ypos):
+        super(TransparentWindowWithBorder, self).__init__()
+
+        self.width = width
+        self.heigth = heigth
+        self.xpos = xpos
+        self.ypos = ypos
+
+        self.tran_setup()
+        self.init_ui()
+
+    def init_ui(self):
+        self.set_decorated(False)
+        self.connect("draw", self.on_draw)
+
+        self.set_title("Transparent window")
+        self.resize(self.width, self.heigth)
+        self.set_position(Gtk.WindowPosition.CENTER)
+        self.connect("delete-event", Gtk.main_quit)
+        self.show_all()
+
+    def tran_setup(self):
+
+        self.set_app_paintable(True)
+        screen = self.get_screen()
+
+        visual = screen.get_rgba_visual()
+        if visual is not None and screen.is_composited():
+            self.set_visual(visual)
+
+    def on_draw(self, wid, cr):
+
+        cr.set_source_rgba(0.0, 0.0, 0.0, 0.0)
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.paint()
+
+        cr.set_line_width(9.0)
+
+        cr.rectangle(0, 0, self.width, self.heigth)
+        cr.set_source_rgba(0.0, 1.0, 0.0, .75)
+        cr.stroke()
+
+    def changeSizeAndPosition(self, newWidth, newHeigth, newPosX, newPosY):
+        self.width = newWidth
+        self.heigth = newHeigth
+        self.xpos = newPosX
+        self.ypos = newPosY
+        self.resize(newWidth, newHeigth)
+        self.move(newPosX, newPosY)

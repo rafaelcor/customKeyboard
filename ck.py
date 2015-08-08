@@ -70,6 +70,7 @@ UI_INFO = """
 
 class CustomKey:
     def __init__(self):
+        self.modernWindow = None
         self.windowKeyboardSize = [500, 300, 500, 300]
         self.widgets = []
         self.ids = {}
@@ -256,25 +257,34 @@ class CustomKey:
 
         vbox1 = Gtk.VBox()
 
+        modernWindow = customWidgets.TransparentWindowWithBorder(self.windowKeyboardSize[0],
+                                                                 self.windowKeyboardSize[1],
+                                                                 self.windowKeyboardSize[2],
+                                                                 self.windowKeyboardSize[3])
+
         self.wadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
         widthSpinButton = customWidgets.SpinButtonWithLabel(_("Width: "))
+        self.wadjustment.connect("value_changed", self.onChangeSpin, 1, modernWindow)
         widthSpinButton.set_adjustment(self.wadjustment)
         print self.windowKeyboardSize[0]
         self.wadjustment.set_value(self.windowKeyboardSize[0])
 
         self.hadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
         heigthSpinButton = customWidgets.SpinButtonWithLabel(_("Heigth: "))
+        self.hadjustment.connect("value_changed", self.onChangeSpin, 2, modernWindow)
         heigthSpinButton.set_adjustment(self.hadjustment)
         print self.windowKeyboardSize[1]
         self.hadjustment.set_value(self.windowKeyboardSize[1])
 
         self.pxadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
         posXSpinButton = customWidgets.SpinButtonWithLabel(_("PosX: "))
+        self.pxadjustment.connect("value_changed", self.onChangeSpin, 3, modernWindow)
         posXSpinButton.set_adjustment(self.pxadjustment)
         self.pxadjustment.set_value(self.windowKeyboardSize[2])
 
         self.pyadjustment = Gtk.Adjustment(0, 0, 5000, 1, 10, 0)
         posYSpinButton = customWidgets.SpinButtonWithLabel(_("PosY: "))
+        self.pyadjustment.connect("value_changed", self.onChangeSpin, 4, modernWindow)
         posYSpinButton.set_adjustment(self.pyadjustment)
         self.pyadjustment.set_value(self.windowKeyboardSize[3])
 
@@ -302,6 +312,31 @@ class CustomKey:
 
         window3.add(hbox1)
         window3.show_all()
+
+
+        print self.modernWindow
+
+    def onChangeSpin(self, widget, numberID, modernWindow):
+        if numberID == 1:
+            modernWindow.changeSizeAndPosition(widget.get_value(),
+                                         self.hadjustment.get_value(),
+                                         self.pxadjustment.get_value(),
+                                         self.pyadjustment.get_value())
+        elif numberID == 2:
+            modernWindow.changeSizeAndPosition(self.wadjustment.get_value(),
+                                         widget.get_value(),
+                                         self.pxadjustment.get_value(),
+                                         self.pyadjustment.get_value())
+        elif numberID == 3:
+            modernWindow.changeSizeAndPosition(self.wadjustment.get_value(),
+                                         self.hadjustment.get_value(),
+                                         widget.get_value(),
+                                         self.pyadjustment.get_value())
+        else:
+            modernWindow.changeSizeAndPosition(self.wadjustment.get_value(),
+                                         self.hadjustment.get_value(),
+                                         self.pxadjustment.get_value(),
+                                         widget.get_value())
 
     def saveChanges(self, widget): # save changes from config keyboard window
         self.windowKeyboardSize = [self.wadjustment.get_value(),

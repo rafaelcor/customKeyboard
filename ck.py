@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # Copyright (C) 2015 Rafael Cordano <rafael.cordano@gmail.com>
-# Copyright (C) 2015 Ezequiel Pereira <ezequi>
+# Copyright (C) 2015 Ezequiel Pereira <eze2307@gmail.com>
+# Copyright (C) 2015 Franco Profeti <fprofeti98@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,34 +41,7 @@ import sendkey
 INITIAL_X, INITIAL_Y = 0, 50
 INITIAL_W, INITIAL_H = 50, 50
 
-
-UI_INFO = """
-<ui>
-  <menubar name='MenuBar'>
-    <menu action='FileMenu'>
-      <menuitem action='FileNewStandard' />
-      <menuitem action='FileOpen' />
-      <menuitem action='FileSave' />
-      <menuitem action='FileSaveAs' />
-      <separator />
-      <menuitem action='FileQuit' />
-    </menu>
-    <menu action='OptionMenu'>
-      <menuitem action='OptionRunKeyboard' />
-      <menuitem action='OptionSetKeyboardWindow' />
-    </menu>
-    <menu action='HelpMenu'>
-      <menuitem action='Help'/>
-      <menuitem action='About'/>
-    </menu>
-  </menubar>
-  <toolbar name='ToolBar'>
-    <toolitem action='FileNewStandard' />
-    <toolitem action='FileOpen' />
-    <toolitem action='FileQuit' />
-  </toolbar>
-</ui>
-"""
+import utils
 
 
 class CustomKey:
@@ -240,13 +216,8 @@ class CustomKey:
             self.bb.set_size_request(self.save[key][2], self.save[key][3])
 
             self.bb.connect('button-press-event', self.onButtonPress, key, self.menu)
-            self.bb.connect('motion-notify-event', self.move_key, key)
+            #segment fault!!#self.bb.connect('motion-notify-event', self.move_key, key)
             self.bb.connect("enter-notify-event", self.test)
-            #self.bb.connect("event", self.onButtonRightClick, self.menu)
-            #self.menu_optionEditProperties.connect("button-press-event",
-             #                                      self.editButton,
-              #                                     self.cont,
-               #                                    self.bb)
             self.bb.add(Gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
             self.widgets.append(self.bb)
@@ -315,7 +286,6 @@ class CustomKey:
         window3.add(hbox1)
         window3.show_all()
 
-
         print self.modernWindow
 
     def onChangeSpin(self, widget, numberID, modernWindow):
@@ -340,13 +310,12 @@ class CustomKey:
                                          self.pxadjustment.get_value(),
                                          widget.get_value())
 
-    def saveChanges(self, widget): # save changes from config keyboard window
+    def saveChanges(self, widget):  # save changes from config keyboard window
         self.windowKeyboardSize = [self.wadjustment.get_value(),
                                    self.hadjustment.get_value(),
                                    self.pxadjustment.get_value(),
                                    self.pyadjustment.get_value()]
         print self.windowKeyboardSize
-
 
     def test(self, widget, event):
         pass
@@ -456,7 +425,7 @@ class CustomKey:
         uimanager = Gtk.UIManager()
 
         # Throws exception if something went wrong
-        uimanager.add_ui_from_string(UI_INFO)
+        uimanager.add_ui_from_string(utils.UI_INFO)
 
         # Add the accelerator group to the toplevel window
         accelgroup = uimanager.get_accel_group()
@@ -475,8 +444,6 @@ class CustomKey:
         return item_factory.get_widget("<main>")
 
     def move_key(self, widget, event, key):
-        #print event.get_click_count()[0]
-        #print dir(event)
         if not self.editing:
             self.evpos = self.save[key][0:2]
             self.evpos[0] += int(event.x - 25)
@@ -491,7 +458,6 @@ class CustomKey:
 
         if event.keyval == 65293 or event.keyval == 65421:
             self.save[key][4] = widget.get_text()
-            #self.save[key][2], self.save[key][3] = button.get_size_request()
 
             widget.destroy()
             button.add(Gtk.Label(self.save[key][4]))
@@ -513,13 +479,10 @@ class CustomKey:
         self.window.set_focus(entry)
         entry.grab_focus()
         entry.connect("key-press-event", self.change_name, key, widget)
-        #entry.connect("focus-out-event", self.change_name2, key, widget)
         widget.add(entry)
         widget.show_all()
-        #entry.set_size_request(50, 50)
 
     def new_button(self, widget, event):
-        #print "new"
         w, h = INITIAL_W, INITIAL_H
         if event.keyval == 110 and self.editing is not True:
             try:
@@ -529,10 +492,25 @@ class CustomKey:
             except:
                 x, y = INITIAL_X, INITIAL_Y
                 w, h = INITIAL_W, INITIAL_H
-            self.save[self.cont] = [((x + w)*100)/self.windowKeyboardSize[0],
-                                     (y*100)/self.windowKeyboardSize[1],
-                                     (50*100)/self.windowKeyboardSize[0],
-                                     (50*100)/self.windowKeyboardSize[1], "", "", "", "", ""]
+
+            print "orig. x: ", x
+            print "orig. y: ", y
+            print "orig. h: ", h
+            print "orig. w: ", w
+
+            print "kw xsize: ",  self.windowKeyboardSize[0]
+            print "kw ysize: ", self.windowKeyboardSize[1]
+
+            self.save[self.cont] = [((x + w) * 100) / self.windowKeyboardSize[0],
+                                     (y * 100) / self.windowKeyboardSize[1],
+                                     (50 * 100) / self.windowKeyboardSize[0],
+                                     (50 * 100) / self.windowKeyboardSize[1],
+                                     "", "", "", "", ""]
+
+            print "x: ",  ((x + w) * 100) / self.windowKeyboardSize[0]
+            print "y: ", (y * 100) / self.windowKeyboardSize[1]
+            print "w: ", (50 * 100) / self.windowKeyboardSize[0]
+            print "h: ", (50 * 100) / self.windowKeyboardSize[1]
 
             b = customWidgets.ResizableEventBox(self.fixed,
                                                       self.save[self.cont][0],
@@ -543,19 +521,17 @@ class CustomKey:
                                                          green=65535,
                                                          blue=65535))
             b.set_border_width(1)
-            b.set_size_request((self.save[self.cont][2]*self.windowKeyboardSize[0])/100,
-                                self.save[self.cont][3]*self.windowKeyboardSize[1]/100)
-            b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
-            b.connect("button-release-event", self.onButtonRelease, self.cont)
-            ####b.connect('motion-notify-event', self.move_key, self.cont)
 
-            #b.connect_object("event", self.onButtonRightClick, self.menu)
-            #self.menu_optionEditProperties.connect("button-press-event",
-             #                                      self.editButton,
-              #                                     self.cont,
-               #                                    b)
             self.fixed.put(b, (self.save[self.cont][0]*self.windowKeyboardSize[0])/100,
                            (self.save[self.cont][1]*self.windowKeyboardSize[1])/100)
+
+            b.set_size_request((self.save[self.cont][2]*self.windowKeyboardSize[0])/100,
+                                self.save[self.cont][3]*self.windowKeyboardSize[1]/100)
+
+
+            b.connect('button-press-event', self.onButtonPress, self.cont, self.menu)
+            b.connect("button-release-event", self.onButtonRelease, self.cont)
+
             self.window.show_all()
 
         self.cont += 1
@@ -583,7 +559,6 @@ class CustomKey:
     def onButtonRelease(self, widget, event, key):
         widget.disconnect(self.ids[key])
         self.ids.pop(key)
-        #print "br"
         self.pos = self.save[key][0:2]
         if (self.evpos[0] != self.pos[0] and
             self.evpos[1] != self.pos[1]):
@@ -595,14 +570,6 @@ class CustomKey:
         else:
             pass
 
-    """
-    def onButtonRightClick(self, widget, event):
-        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-            print "right click"
-            widget.popup(None, None, None, None, 3, event.time)
-            print
-            pass
-    """
 
     def invokeImageDialog(self, widget, event):
         imageDialog = Gtk.FileChooserDialog(_("Open Image"), None,
@@ -628,8 +595,6 @@ class CustomKey:
     def removeButton(self, widget, event):
         self.save.pop(self.selected)
         self.init()
-        #button.destroy()
-        #self.fixed.show_all()
         print self.selected
 
     def editButton(self, widget, event):
@@ -654,10 +619,8 @@ class CustomKey:
         name_store.append([2, "System Action"])
 
         actions = Gtk.ComboBox.new_with_model_and_entry(name_store)
-        #name_combo.connect("changed", self.on_name_combo_changed)
         actions.set_entry_text_column(1)
         actions.set_active(0)
-
 
 
         self.entryCombo = Gtk.Entry()

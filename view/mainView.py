@@ -36,6 +36,7 @@ import zipfile
 import json
 from gi.repository import Gtk, Gdk, Pango, GdkPixbuf
 import customWidgets
+
 from dialogs import *
 
 from sendkey import *
@@ -126,6 +127,9 @@ class CustomKey:
     def getSave(self):
         return self.save
 
+    def modifySaveEntry(self, key, attr, newValue):
+        self.save[key][attr] = newValue
+
     def focus_out(self, *args):
         for widget in self.widgets:
             if widget.can_focus_out:
@@ -195,7 +199,8 @@ class CustomKey:
                                                       self.save[key][0],
                                                       self.save[key][1],
                                                       self.save[key][2],
-                                                      self.save[key][3])
+                                                      self.save[key][3],
+                                                      key)
             self.bb.set_border_width(1)
             try:
                 self.bb.modify_bg(Gtk.StateFlags.NORMAL, self.save[key][6])
@@ -476,7 +481,9 @@ class CustomKey:
                                                 self.save[self.cont][0],
                                                 self.save[self.cont][1],
                                                 self.save[self.cont][2],
-                                                self.save[self.cont][3])
+                                                self.save[self.cont][3],
+                                                self.cont,
+                                                self)
             b.modify_bg(Gtk.StateFlags.NORMAL, Gdk.Color(red=65535,
                                                          green=65535,
                                                          blue=65535))

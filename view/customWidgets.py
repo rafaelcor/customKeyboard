@@ -18,11 +18,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-
+import sys
+sys.path.insert(0, '../controller/')
 
 ENABLE_HANDLES = True
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import cairo
+from mainView import *
 
 
 class SpinButtonWithLabel(Gtk.HBox, Gtk.SpinButton):
@@ -38,8 +40,9 @@ class SpinButtonWithLabel(Gtk.HBox, Gtk.SpinButton):
 
 
 class ResizableEventBox(Gtk.EventBox):
-    def __init__(self, fixed, x, y, w, h):
+    def __init__(self, fixed, x, y, w, h, keyID, ss):
         super(ResizableEventBox, self).__init__()
+        self.ss = ss
         self.typec = 2
         self.fixed = fixed
         self.resizePos = []
@@ -60,7 +63,7 @@ class ResizableEventBox(Gtk.EventBox):
             self.connect("button-press-event", self.enableResize)
         self.connect("leave-notify-event", self.set_focus_out)
         self.connect("motion-notify-event", self.set_focus_in)
-        self.connect("size-allocate", self.resized)
+        self.connect("size-allocate", self.resized, keyID)
         im1, im2, im3, im4 = Gtk.Image(),Gtk.Image(),Gtk.Image(),Gtk.Image()
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(
                                                       "../img/resizer.png",
@@ -217,8 +220,15 @@ class ResizableEventBox(Gtk.EventBox):
     def set_focus_in(self, *args):
         self.can_focus_out = False
 
-    def resized(self, widget, event):
+    def resized(self, widget, event, keyID):
         self.pos = [event.x, event.y, event.width, event.height]
+
+
+
+        self.ss.modifySaveEntry(keyID, 2, event.width)
+        self.ss.modifySaveEntry(keyID, 3, event.height)
+
+        print "RSED"
         print self.pos
 
     def relocate_handles(self, *args):

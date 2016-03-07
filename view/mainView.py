@@ -184,13 +184,13 @@ class CustomKey:
                 print "---"
                 toSimulate = self.save[key][5].split("->")[1]
                 print "---"
-                button.connect("clicked", sendkey.sendkey, toSimulate)
+                button.connect("clicked", sendkey, toSimulate)
             elif self.save[key][5].split("->")[0] == "Speak":
                 button.connect("clicked", lambda x: os.system("espeak -ves '%s'"
                                           % self.save[key][5].split("->")[1]))
             elif self.save[key][5].split("->")[0] == "System Action":
                 pass
-
+#
     def init(self):
         for child in self.fixed.get_children():
             child.destroy()
@@ -200,7 +200,8 @@ class CustomKey:
                                                       self.save[key][1],
                                                       self.save[key][2],
                                                       self.save[key][3],
-                                                      key)
+                                                      key,
+                                                      self)
             self.bb.set_border_width(1)
             try:
                 self.bb.modify_bg(Gtk.StateFlags.NORMAL, self.save[key][6])
@@ -232,7 +233,7 @@ class CustomKey:
 
             self.bb.connect('button-press-event', self.onButtonPress, key, self.menu)
             #segment fault!!#self.bb.connect('motion-notify-event', self.move_key, key)
-            self.bb.connect("enter-notify-event", self.test)
+            #self.bb.connect("enter-notify-event", self.test)
             self.bb.add(Gtk.Label(self.save[key][4]))
             self.fixed.put(self.bb, self.save[key][0], self.save[key][1])
             self.widgets.append(self.bb)
